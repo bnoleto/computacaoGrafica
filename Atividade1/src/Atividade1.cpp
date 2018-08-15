@@ -5,6 +5,7 @@
 
 int sizeX=500,sizeY=500;
 int pointSize = sizeX*sizeY/5000;
+double offsetY = 0;
 
 class Pixel{
 	private:
@@ -41,8 +42,7 @@ class Pixel{
 			double xa = (double)x/sizeX;
 			double ya = -(double)y/sizeY;
 			glColor3f((double)r/255, (double)g/255, (double)b/255); // Red
-			//glVertex2d(((xa*2*pointSize)-1)+((double)pointSize/sizeX), ((ya*2*pointSize)+1-((double)pointSize/sizeY)));
-			glVertex2d(xa*pointSize*2+((double)pointSize/sizeX)-1, ya*pointSize*2-((double)pointSize/sizeY)+1);
+			glVertex2d(((xa*2*pointSize)-1)+((double)pointSize/sizeX), ((ya*2*pointSize)+1-((double)pointSize/sizeY))+offsetY);
 
 		}
 };
@@ -87,14 +87,7 @@ void display() {
 
 void changeSize(int w, int h) {
 
-
-	sizeX = w;
-	sizeY = h;
-
-
-	std::cout << w << ": " << h << " / " << pointSize << std::endl;
-	pointSize = sizeX*sizeY/5000;
-
+	offsetY = (double)-(sizeY-h)/h;
 }
 
 /* Main function: GLUT runs as a console application starting at main()  */
