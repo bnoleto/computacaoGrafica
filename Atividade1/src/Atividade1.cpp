@@ -5,9 +5,7 @@
 
 using namespace std;
 
-int sizeX=500,sizeY=500;
-int pointSize = sizeX*sizeY/5000;
-double offsetY = 0;
+int offsetY = 0;
 
 class Pixel{
 	private:
@@ -37,10 +35,9 @@ class Pixel{
 		}
 
 		void imprimir_pixel(){
-			double xa = (double)x/sizeX;
-			double ya = -(double)y/sizeY;
 			glColor3f((double)r/255, (double)g/255, (double)b/255); // Red
-			glVertex2d(((xa*2*pointSize)-1)+((double)pointSize/sizeX), ((ya*2*pointSize)+1-((double)pointSize/sizeY))+offsetY);
+			//glVertex2d(((xa*2*pointSize)-1)+((double)pointSize/sizeX), ((ya*2*pointSize)+1-((double)pointSize/sizeY))+offsetY);
+			glVertex2i(x, -y);
 
 		}
 };
@@ -49,7 +46,8 @@ vector<Pixel> pixels;
 
 void inicializar_pixels(){
 	pixels.push_back(Pixel(0,0,255,255,255));
-	pixels.push_back(Pixel(1,1,255,0,255));
+	pixels.push_back(Pixel(-0.5,-0.5,255,0,255));
+
 	pixels.push_back(Pixel(5,5,255,0,255));
 	pixels.push_back(Pixel(6,5,0,0,255));
 	pixels.push_back(Pixel(7,5,0,255,0));
@@ -63,20 +61,16 @@ void display() {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
 	glClear(GL_COLOR_BUFFER_BIT);         // Clear the color buffer
 
-	glPointSize(pointSize);
+	glPointSize(50);
 	glBegin(GL_POINTS);
 
 	for(unsigned int i = 0; i<pixels.size(); i++){
 		pixels.at(i).imprimir_pixel();
+		cout << i << endl;
 	}
 	glEnd();
 
 	glFlush();  // Render now
-}
-
-void changeSize(int w, int h) {
-
-	offsetY = (double)-(sizeY-h)/h;
 }
 
 /* Main function: GLUT runs as a console application starting at main()  */
@@ -84,11 +78,11 @@ int main(int argc, char** argv) {
 	inicializar_pixels();
 
 	glutInit(&argc, argv);                 // Initialize GLUT
-	glutInitWindowSize(sizeX, sizeY);   // Set the window's initial width & height
+	glutInitWindowSize(500, 500);   // Set the window's initial width & height
 	glutInitWindowPosition(100, 100); // Position the window's initial top-left corner
 	glutCreateWindow("Atividade 1"); // Create a window with the given title
 	glutDisplayFunc(display); // Register display callback handler for window re-paint
-	glutReshapeFunc(changeSize);
+	//gluOrtho2D(0, 500, 500, 0);
 	glutMainLoop();           // Enter the infinitely event-processing loop
 	return 0;
 }
