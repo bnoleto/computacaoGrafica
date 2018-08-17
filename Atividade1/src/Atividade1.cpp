@@ -3,6 +3,8 @@
 #include <vector>
 #include <iostream>
 
+using namespace std;
+
 int sizeX=500,sizeY=500;
 int pointSize = sizeX*sizeY/5000;
 double offsetY = 0;
@@ -21,10 +23,6 @@ class Pixel{
 			this->r = r;
 			this->g = g;
 			this->b = b;
-		}
-
-		Pixel(){
-
 		}
 
 		void set_posicao(unsigned short x, unsigned short y){
@@ -47,42 +45,33 @@ class Pixel{
 		}
 };
 
+vector<Pixel> pixels;
+
+void inicializar_pixels(){
+	pixels.push_back(Pixel(0,0,255,255,255));
+	pixels.push_back(Pixel(1,1,255,0,255));
+	pixels.push_back(Pixel(5,5,255,0,255));
+	pixels.push_back(Pixel(6,5,0,0,255));
+	pixels.push_back(Pixel(7,5,0,255,0));
+	pixels.push_back(Pixel(6,6,255,255,0));
+	pixels.push_back(Pixel(7,6,0,255,255));
+}
+
 /* Handler for window-repaint event. Call back when the window first appears and
    whenever the window needs to be re-painted. */
 void display() {
-   glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
-   glClear(GL_COLOR_BUFFER_BIT);         // Clear the color buffer
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
+	glClear(GL_COLOR_BUFFER_BIT);         // Clear the color buffer
 
-/* // Draw a Red 1x1 Square centered at origin
- * glBegin(GL_QUADS);              // Each set of 4 vertices form a quad
- *    glColor3f(1.0f, 0.0f, 0.0f); // Red
- *    glVertex2f(-0.5f, -0.5f);    // x, y
- *    glVertex2f( 0.5f, -0.5f);
- *    glVertex2f( 0.5f,  0.5f);
- *    glVertex2f(-0.5f,  0.5f);
- * glEnd();
- */
+	glPointSize(pointSize);
+	glBegin(GL_POINTS);
 
-   Pixel *p0 = new Pixel(0,0,255,255,255);
-   Pixel *p01 = new Pixel(1,1,255,0,255);
-   Pixel *p1 = new Pixel(5,5,255,0,255);
-   Pixel *p2 = new Pixel(6,5,0,0,255);
-   Pixel *p3 = new Pixel(7,5,0,255,0);
-   Pixel *p4 = new Pixel(6,6,255,255,0);
-   Pixel *p5 = new Pixel(7,6,0,255,255);
+	for(unsigned int i = 0; i<pixels.size(); i++){
+		pixels.at(i).imprimir_pixel();
+	}
+	glEnd();
 
-   glPointSize(pointSize);
-   glBegin(GL_POINTS);
-   	p0->imprimir_pixel();
-   	p01->imprimir_pixel();
-	p1->imprimir_pixel();
-	p2->imprimir_pixel();
-	p3->imprimir_pixel();
-	p4->imprimir_pixel();
-	p5->imprimir_pixel();
-   glEnd();
-
-   glFlush();  // Render now
+	glFlush();  // Render now
 }
 
 void changeSize(int w, int h) {
@@ -92,12 +81,14 @@ void changeSize(int w, int h) {
 
 /* Main function: GLUT runs as a console application starting at main()  */
 int main(int argc, char** argv) {
-   glutInit(&argc, argv);                 // Initialize GLUT
-   glutInitWindowSize(sizeX, sizeY);   // Set the window's initial width & height
-   glutInitWindowPosition(100, 100); // Position the window's initial top-left corner
-   glutCreateWindow("Atividade 1"); // Create a window with the given title
-   glutDisplayFunc(display); // Register display callback handler for window re-paint
-   glutReshapeFunc(changeSize);
-   glutMainLoop();           // Enter the infinitely event-processing loop
-   return 0;
+	inicializar_pixels();
+
+	glutInit(&argc, argv);                 // Initialize GLUT
+	glutInitWindowSize(sizeX, sizeY);   // Set the window's initial width & height
+	glutInitWindowPosition(100, 100); // Position the window's initial top-left corner
+	glutCreateWindow("Atividade 1"); // Create a window with the given title
+	glutDisplayFunc(display); // Register display callback handler for window re-paint
+	glutReshapeFunc(changeSize);
+	glutMainLoop();           // Enter the infinitely event-processing loop
+	return 0;
 }
