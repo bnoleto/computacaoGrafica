@@ -14,10 +14,6 @@ class Funcoes{
 
 	public:
 
-	Funcoes(){
-
-	}
-
 	void adicionar_ponto(int x, int y){
 		pontos.push_back(Ponto(x,y));
 		cout << "Ponto (" << x << ", " << y << ") adicionado!" << endl;

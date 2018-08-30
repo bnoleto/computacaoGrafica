@@ -10,20 +10,19 @@ class Funcoes{
 	private:
 
 	vector<Ponto*> pontos;
-	Ponto* excluido_backup = new Ponto(-10,-10); //ponto dummy para não ocorrer exceção caso não tenha nenhum ponto
-	Ponto* excluido = excluido_backup; //inicial
+	Ponto* dummy = new Ponto(-10,-10); //ponto dummy para não ocorrer exceção caso não tenha nenhum ponto
+	Ponto* excluido = dummy; //inicial
 	Ponto* atual = excluido;
 
 	public:
 
-	Funcoes(){
-
-	}
+	unsigned char point_size = 5;
 
 	void adicionar_ponto(int x, int y){
 		pontos.push_back(new Ponto(x,y));
 		cout << "Ponto (" << x << ", " << y << ") adicionado!" << endl;
-		excluido = excluido_backup;
+		excluido = dummy;
+		atual = pontos.back();
 	}
 
 	void remover_ponto(Ponto ponto){
@@ -42,6 +41,10 @@ class Funcoes{
 	vector<Ponto*> get_pontos(){
 		return this->pontos;
 	}
+
+	vector<Ponto*>* get_pontos_ref(){
+			return &this->pontos;
+		}
 
 	Ponto* get_ponto_atual(){
 		return atual;
@@ -66,33 +69,37 @@ class Funcoes{
 		float menorDistancia;
 		int indiceMenorDistancia;
 
-		vector<Ponto*> pontos = get_pontos();
+		vector<Ponto*>* pontos = get_pontos_ref();
 
-		for(unsigned int i = 0; i< pontos.size(); i++){		// o laço irá comparar as distâncias entre cada ponto do vetor e a posição clicada
+/*		//teste
+		string result = (this->pontos == *pontos) ? "*são o msm objeto" : "*não são o mesmo";
+		cout << result << endl;
+*/
+		for(unsigned int i = 0; i< pontos->size(); i++){		// o laço irá comparar as distâncias entre cada ponto do vetor e a posição clicada
 			if(i==0){				// ação a ser realizada caso tenha apenas 1 ponto declarado no vetor
-				menorDistancia = calcularDistancia(*pontos.at(i), x, y);
+				menorDistancia = calcularDistancia(*pontos->at(i), x, y);
 				indiceMenorDistancia = i;
 			}
 			else{					// ação a ser realizada caso tenha 2 ou mais pontos declarados no vetor
-				if(calcularDistancia(*pontos.at(i), x, y) < menorDistancia){
-					menorDistancia = calcularDistancia(*pontos.at(i), x, y);
+				if(calcularDistancia(*pontos->at(i), x, y) < menorDistancia){
+					menorDistancia = calcularDistancia(*pontos->at(i), x, y);
 					indiceMenorDistancia = i;
 				}
 			}
 		}
 
-		if(pontos.size() == 0){
-			return excluido_backup;
+		if(pontos->size() == 0){
+			return dummy;
 		}
-		return pontos.at(indiceMenorDistancia);
+		return pontos->at(indiceMenorDistancia);
 	}
 
 	bool atual_eh_dummy(){
-		return atual == excluido_backup;
+		return atual == dummy;
 	}
 
 	Ponto* get_dummy(){
-		return this->excluido_backup;
+		return this->dummy;
 	}
 
 	short limitar(short valor, short incremento){
@@ -103,7 +110,7 @@ class Funcoes{
 	}
 };
 
-Funcoes funcoes; // variável global para as funções do programa
+Funcoes funcoes; // classe global para as funções do programa
 
 void display() {
 
@@ -111,7 +118,7 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT);         // Clear the color buffer
 
 	glColor3ub(255, 0, 0);
-	glPointSize(5);
+	glPointSize(funcoes.point_size);
 	glBegin(GL_POINTS);
 		for(unsigned int i = 0; i<funcoes.get_pontos().size(); i++){
 			if(!(funcoes.get_pontos().at(i) == funcoes.get_ponto_atual())){
@@ -130,8 +137,10 @@ void mouse(int botao, int estado, int x, int y){
 
 	if (estado == GLUT_DOWN){
 		if(botao == GLUT_LEFT_BUTTON){
-			funcoes.adicionar_ponto(((x + 4)/5) * 5,((y + 4)/5) * 5); // expressão matemática para aproximar os valores para
-		}														  // múltiplos de 5
+			funcoes.adicionar_ponto(((x + 4)/funcoes.point_size) * funcoes.point_size,
+					((y + 4)/funcoes.point_size) * funcoes.point_size);
+						// expressão matemática para arredondar os valores para múltiplos de point_size
+		}
 		if(botao == GLUT_RIGHT_BUTTON){
 			if(funcoes.pontoMaisProx(x, y) == funcoes.get_dummy()){	// vai garantir que o ponto dummy não vai ser selecionado
 				return;
@@ -150,16 +159,16 @@ void teclado(int tecla, int mouseX, int mouseY){
 	}
 
 	if(tecla == GLUT_KEY_UP){
-		funcoes.get_ponto_atual()->set(x_atual, funcoes.limitar(y_atual,-5));
+		funcoes.get_ponto_atual()->set(x_atual, funcoes.limitar(y_atual,-funcoes.point_size));
 	}
 	if(tecla == GLUT_KEY_DOWN){
-		funcoes.get_ponto_atual()->set(x_atual, funcoes.limitar(y_atual,5));
+		funcoes.get_ponto_atual()->set(x_atual, funcoes.limitar(y_atual,funcoes.point_size));
 	}
 	if(tecla == GLUT_KEY_LEFT){
-		funcoes.get_ponto_atual()->set(funcoes.limitar(x_atual,-5), y_atual);
+		funcoes.get_ponto_atual()->set(funcoes.limitar(x_atual,-funcoes.point_size), y_atual);
 	}
 	if(tecla == GLUT_KEY_RIGHT){
-		funcoes.get_ponto_atual()->set(funcoes.limitar(x_atual,5), y_atual);
+		funcoes.get_ponto_atual()->set(funcoes.limitar(x_atual,funcoes.point_size), y_atual);
 	}
 
 	glutPostRedisplay();
