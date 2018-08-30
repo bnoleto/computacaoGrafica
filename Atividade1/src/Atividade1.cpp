@@ -6,7 +6,7 @@
 
 using namespace std;
 
-vector<Pixel> pixels;
+vector<Ponto> pixels;
 
 
 /* Handler for window-repaint event. Call back when the window first appears and
