@@ -173,10 +173,10 @@ void mouse(int botao, int estado, int x, int y){
 
 void teclado(unsigned char tecla, int x, int y){
 
-	if(tecla == 's'){
+	if(toupper(tecla) == 'S'){
 		funcoes.salvar_arquivo();
 	}
-	if(tecla == 'o'){
+	if(toupper(tecla) == 'O'){
 		funcoes.abrir_arquivo();
 	}
 

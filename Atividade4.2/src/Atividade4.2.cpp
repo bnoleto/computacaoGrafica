@@ -107,7 +107,7 @@ void display() {
 
 void teclado(unsigned char tecla, int x, int y){
 
-	if(tecla == 'o'){
+	if(toupper(tecla) == 'O'){
 		funcoes.abrir_arquivo();
 	}
 
