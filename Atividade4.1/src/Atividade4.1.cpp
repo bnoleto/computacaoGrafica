@@ -2,7 +2,7 @@
 #include <vector>
 #include "Ponto.h"
 #include <iostream>
-#include<fstream>
+#include <fstream>
 #include <Math.h>
 
 using namespace std;
@@ -58,7 +58,7 @@ class Funcoes{
 			return NULL;
 		}
 
-		Ponto* ponto_mais_proximo = pontos.at(0);
+		Ponto* ponto_mais_proximo = pontos.at(0); // inicial
 
 		for(unsigned int i = 0; i< pontos.size(); i++){		// o laço irá comparar as distâncias entre cada ponto do vetor e a posição clicada
 			if(calcularDistancia(pontos.at(i), x, y) < calcularDistancia(ponto_mais_proximo, x, y)){
@@ -94,10 +94,41 @@ class Funcoes{
 		}
 
 		arquivo.close();
+
+		cout << "> Arquivo saida.dat salvo!" << endl;
 	}
 
 	void abrir_arquivo(){
+		fstream arquivo;
 
+
+		arquivo.open("entrada.dat", ios::in);
+		if(arquivo.is_open()){
+
+			pontos.clear();		// vai esvaziar a lista de pontos atual para que sejam criados os pontos a serem importados
+
+			string linha;
+
+			while(getline (arquivo,linha)){
+				int x, y;
+
+				for(unsigned int i = 0; i< linha.length(); i++){
+					if(linha.at(i) == ' '){
+						x = stoi(linha.substr(0, i));		// irá copiar e converter para int a substring dos caracteres na 1ª posição até i
+						y = stoi(linha.substr(i+1));		// irá copiar e converter para int a substring dos caracteres da i+1 posição até o final
+						adicionar_ponto(x, y);
+						break;
+					}
+				}
+			}
+			arquivo.close();
+
+			cout << "> Arquivo entrada.dat importado!" << endl;
+		} else {
+			cout << "> Não foi possível abrir o arquivo entrada.dat!" << endl;
+		}
+
+		glutPostRedisplay();
 	}
 };
 
