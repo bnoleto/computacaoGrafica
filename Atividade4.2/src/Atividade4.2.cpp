@@ -41,7 +41,7 @@ class Funcoes{
 				getline(arquivo,str_nucleos);
 				int qtd_linhas = stoi(str_nucleos);
 
-				cout << "+ Núcleo " << nucleo+1 << "\n";
+				cout << "+ Núcleo " << nucleo+1 << " (" << qtd_linhas <<") pontos" << "\n";
 				for(int linha_atual = 0; linha_atual < qtd_linhas; linha_atual++){
 					string linha;
 					getline(arquivo,linha);
