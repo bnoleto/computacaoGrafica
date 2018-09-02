@@ -41,7 +41,7 @@ class Funcoes{
 				getline(arquivo,str_nucleos);
 				int qtd_linhas = stoi(str_nucleos);
 
-				cout << "+ Núcleo " << nucleo << "\n";
+				cout << "+ Núcleo " << nucleo+1 << "\n";
 				for(int linha_atual = 0; linha_atual < qtd_linhas; linha_atual++){
 					string linha;
 					getline(arquivo,linha);
@@ -80,11 +80,27 @@ void display() {
 	glColor3ub(255, 0, 0);
 
 	for(unsigned int i = 0; i<funcoes.get_nucleos()->size(); i++){
-		glBegin(GL_LINE_STRIP);
-			for(unsigned int j = 0; j < funcoes.get_nucleos()->at(i)->size(); j++){
-				glVertex2i(funcoes.get_nucleos()->at(i)->at(j)->get_x(), funcoes.get_nucleos()->at(i)->at(j)->get_y());
+
+		for(unsigned int j = 0; j < funcoes.get_nucleos()->at(i)->size()-1; j++){
+			/*		glBegin(GL_LINE_STRIP);
+						for(unsigned int j = 0; j < funcoes.get_nucleos()->at(i)->size(); j++){
+							glVertex2i(funcoes.get_nucleos()->at(i)->at(j)->get_x(), funcoes.get_nucleos()->at(i)->at(j)->get_y());
+						}
+					glEnd();*/
+			if(j == funcoes.get_nucleos()->at(i)->size()-1){	// ligação da última com a primeira linha
+				glBegin(GL_LINES);
+					glVertex2i(funcoes.get_nucleos()->at(i)->at(j)->get_x(), funcoes.get_nucleos()->at(i)->at(j)->get_y());
+					glVertex2i(funcoes.get_nucleos()->at(i)->at(0)->get_x(), funcoes.get_nucleos()->at(i)->at(0)->get_y());
+				glEnd();
+			} else {	// condição normal
+				glBegin(GL_LINES);
+					glVertex2i(funcoes.get_nucleos()->at(i)->at(j)->get_x(), funcoes.get_nucleos()->at(i)->at(j)->get_y());
+					glVertex2i(funcoes.get_nucleos()->at(i)->at(j+1)->get_x(), funcoes.get_nucleos()->at(i)->at(j+1)->get_y());
+				glEnd();
 			}
-		glEnd();
+		}
+
+
 	}
 	glFlush();  // Render now
 }
