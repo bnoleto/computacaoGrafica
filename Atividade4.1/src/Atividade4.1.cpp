@@ -76,9 +76,6 @@ class Funcoes{
 			glBegin(GL_LINES);
 				glVertex2i(excluido->get_x()-3, excluido->get_y()-3);
 				glVertex2i(excluido->get_x()+3, excluido->get_y()+3);
-			glEnd();
-
-			glBegin(GL_LINES);
 				glVertex2i(excluido->get_x()+3, excluido->get_y()-3);
 				glVertex2i(excluido->get_x()-3, excluido->get_y()+3);
 			glEnd();
@@ -109,7 +106,7 @@ class Funcoes{
 
 			string linha;
 
-			while(getline (arquivo,linha)){
+			while(getline(arquivo,linha)){
 				int x, y;
 
 				for(unsigned int i = 0; i< linha.length(); i++){
