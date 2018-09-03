@@ -16,7 +16,7 @@ class Funcoes{
 
 	void adicionar_ponto_nucleo(vector<Ponto*>* nucleo,int x, int y){
 		nucleo->push_back(new Ponto(x,y));
-		cout << "Ponto (" << x << ", " << y << ") adicionado!" << endl;
+		cout << "Ponto (" << x << ", " << y << ") adicionado! [" << nucleo->size() << "]" << endl;
 	}
 
 	vector<vector<Ponto*>*>* get_nucleos(){
@@ -41,7 +41,7 @@ class Funcoes{
 				getline(arquivo,str_nucleos);
 				int qtd_linhas = stoi(str_nucleos);
 
-				cout << "+ Núcleo " << nucleo+1 << " (" << qtd_linhas <<") pontos" << "\n";
+				cout << "+ Núcleo " << nucleo+1 << " (" << qtd_linhas <<" pontos)" << "\n";
 				for(int linha_atual = 0; linha_atual < qtd_linhas; linha_atual++){
 					string linha;
 					getline(arquivo,linha);
