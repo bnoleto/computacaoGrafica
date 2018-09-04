@@ -120,7 +120,7 @@ int main(int argc, char** argv) {
 	glutInitWindowSize(500, 500);   // Set the window's initial width & height
 	glutInitWindowPosition(100, 100); // Position the window's initial top-left corner
 	glutCreateWindow("Atividade 4.2"); // Create a window with the given title
-	gluOrtho2D(0, 500, 500, 0);
+	gluOrtho2D(0, 650, 0, 650);
 	glutKeyboardFunc(teclado);
 	glutDisplayFunc(display); // Register display callback handler for window re-paint
 	glutMainLoop();           // Enter the infinitely event-processing loop
