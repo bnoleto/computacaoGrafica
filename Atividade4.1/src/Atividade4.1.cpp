@@ -99,7 +99,7 @@ class Funcoes{
 		fstream arquivo;
 
 
-		arquivo.open("entrada.dat", ios::in);
+		arquivo.open("saida.dat", ios::in);
 		if(arquivo.is_open()){
 
 			pontos.clear();		// vai esvaziar a lista de pontos atual para que sejam criados os pontos a serem importados
@@ -120,9 +120,9 @@ class Funcoes{
 			}
 			arquivo.close();
 
-			cout << "> Arquivo entrada.dat importado!" << endl;
+			cout << "> Arquivo saida.dat importado!" << endl;
 		} else {
-			cout << "> Não foi possível abrir o arquivo entrada.dat!" << endl;
+			cout << "> Não foi possível abrir o arquivo saida.dat!" << endl;
 		}
 
 		glutPostRedisplay();

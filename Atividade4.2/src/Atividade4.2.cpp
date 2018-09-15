@@ -1,7 +1,6 @@
 #include <GL/glut.h>  // GLUT, includes glu.h and gl.h
 #include <vector>
 #include "Ponto.h"
-#include <iostream>
 #include <fstream>
 #include <Math.h>
 
@@ -81,24 +80,11 @@ void display() {
 
 	for(unsigned int i = 0; i<funcoes.get_nucleos()->size(); i++){
 
-		for(unsigned int j = 0; j < funcoes.get_nucleos()->at(i)->size()-1; j++){
-			/*		glBegin(GL_LINE_STRIP);
-						for(unsigned int j = 0; j < funcoes.get_nucleos()->at(i)->size(); j++){
-							glVertex2i(funcoes.get_nucleos()->at(i)->at(j)->get_x(), funcoes.get_nucleos()->at(i)->at(j)->get_y());
-						}
-					glEnd();*/
-			if(j == funcoes.get_nucleos()->at(i)->size()-1){	// ligação da última com a primeira linha
-				glBegin(GL_LINES);
+			glBegin(GL_LINE_STRIP);
+				for(unsigned int j = 0; j < funcoes.get_nucleos()->at(i)->size(); j++){
 					glVertex2i(funcoes.get_nucleos()->at(i)->at(j)->get_x(), funcoes.get_nucleos()->at(i)->at(j)->get_y());
-					glVertex2i(funcoes.get_nucleos()->at(i)->at(0)->get_x(), funcoes.get_nucleos()->at(i)->at(0)->get_y());
-				glEnd();
-			} else {	// condição normal
-				glBegin(GL_LINES);
-					glVertex2i(funcoes.get_nucleos()->at(i)->at(j)->get_x(), funcoes.get_nucleos()->at(i)->at(j)->get_y());
-					glVertex2i(funcoes.get_nucleos()->at(i)->at(j+1)->get_x(), funcoes.get_nucleos()->at(i)->at(j+1)->get_y());
-				glEnd();
-			}
-		}
+				}
+			glEnd();
 
 
 	}
@@ -120,7 +106,7 @@ int main(int argc, char** argv) {
 	glutInitWindowSize(500, 500);   // Set the window's initial width & height
 	glutInitWindowPosition(100, 100); // Position the window's initial top-left corner
 	glutCreateWindow("Atividade 4.2"); // Create a window with the given title
-	gluOrtho2D(0, 500, 500, 0);
+	gluOrtho2D(0, 650, 0, 650);
 	glutKeyboardFunc(teclado);
 	glutDisplayFunc(display); // Register display callback handler for window re-paint
 	glutMainLoop();           // Enter the infinitely event-processing loop
