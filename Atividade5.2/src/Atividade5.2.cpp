@@ -31,16 +31,16 @@ class Funcoes{
 		if(tipo == 1){
 			int x = ponto_central->get_x();
 			int y = ponto_central->get_y();
-			for(int i = 0; i<8; i++){
+			for(int i = 0; i<8; i++){	// laço para 8 teardrops
 
 				float angulo = i*45;
 
-				Ponto* p_inicial_teardrop = new Ponto(
+				Ponto* p_inicial_teardrop = new Ponto(	// irá se afastar 30 pixels do ponto central
 						x + 30*cos(rad(angulo)),
 						y - 30*sin(rad(angulo))
 				);
 
-				lista_teardrop->push_back(new Teardrop(p_inicial_teardrop,30,angulo+90));
+				lista_teardrop->push_back(new Teardrop(p_inicial_teardrop,30,angulo+90));	// irá rotacionar o teardrop no ângulo atual + 90 graus em relação ao seu ponto inicial
 			}
 		}
 		else{

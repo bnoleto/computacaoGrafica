@@ -19,19 +19,8 @@ private:
 	int raio;
 	int angulo;
 
-public:
-	Teardrop(Ponto* p_inicial, int raio, int angulo) {
-		this->ponto_inicial = p_inicial;
-		pontos->push_back(ponto_inicial);
-		this->raio = raio;
-		this->angulo = angulo;
-
-		int x = this->ponto_inicial->get_x(), y = this->ponto_inicial->get_y();
-
-		this->centro_circunferencia = new Ponto(x + 4*this->raio*cos(rad(-this->angulo)), y + 4*this->raio*sin(rad(-this->angulo)));
-
-		gerarCircunferencia();
-
+	float rad(float angulo){	// converterá de graus para radianos
+		return angulo*3.141592/180;
 	}
 
 	void gerarCircunferencia(){
@@ -39,18 +28,30 @@ public:
 		int y = centro_circunferencia->get_y();
 		for(int i = 0; i<180; i++){
 			pontos->push_back(new Ponto(
-					x + this->raio*cos(rad(-1*(90+angulo-i))),
-					y + this->raio*sin(rad(-1*(90+angulo-i)))
+					x + raio*cos(rad(-1*(90+angulo-i))),
+					y + raio*sin(rad(-1*(90+angulo-i)))
 			));
 		}
 	}
 
-	float rad(float angulo){	// converterá de graus para radianos
-		return angulo*3.141592/180;
+public:
+	Teardrop(Ponto* p_inicial, int r, int ang) {
+		this->ponto_inicial = p_inicial;
+		pontos->push_back(ponto_inicial);
+		this->raio = r;
+		this->angulo = ang;
+
+		int x = this->ponto_inicial->get_x(), y = this->ponto_inicial->get_y();
+
+		// a distância do ponto inicial ao ponto central da circunferência será 4*raio
+		this->centro_circunferencia = new Ponto(x + 4*raio*cos(rad(-angulo)), y + 4*raio*sin(rad(-angulo)));
+
+		gerarCircunferencia();
+
 	}
 
 	vector<Ponto*>* get_pontos(){
-		return this->pontos;
+		return pontos;
 	}
 
 };
