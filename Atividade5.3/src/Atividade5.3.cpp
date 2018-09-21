@@ -22,9 +22,11 @@ class Funcoes{
 		for(int i_x = -1000; i_x< 1000; i_x++){
 
 			float x = (float)i_x/1000;
-			float y = x-100*(pow(x,5));		// f(x) = x-100*(x^5)
-			//float y = pow(x,3);		// f(x) = x³
+			//float y = x-100*(pow(x,5));									// f(x) = x-100*(x^5)
+			//float y = pow(x,3);											// f(x) = x^3
+			float y = pow(pow(x,2)+pow(x,2)-1,3)-(pow(x,2)*pow(x,3));		// f(x) = (x^2+x^2-1)^3-x^2*x^3
 			lista_pontos->push_back(new Ponto(x,y));
+			cout << x << ", " << y << endl;
 		}
 	}
 };
@@ -58,7 +60,6 @@ void display() {
 	glBegin(GL_LINE_STRIP);
 	for(unsigned int j = 0; j< funcoes.lista_pontos->size(); j++){
 		Ponto* atual = funcoes.lista_pontos->at(j);
-		cout << atual->get_x() << ", " << atual->get_y() << endl;
 			glVertex2f(atual->get_x(),atual->get_y());
 		}
 	glEnd();
