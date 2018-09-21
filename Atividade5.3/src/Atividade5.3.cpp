@@ -8,6 +8,9 @@
 using namespace std;
 
 class Funcoes{
+	private:
+	unsigned int dominio;
+
 	public:
 	vector<Ponto*>* lista_pontos = new vector<Ponto*>;
 
@@ -18,16 +21,22 @@ class Funcoes{
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // Set background color to black and opaque
 	}
 
-	void funcao_matematica(){
-		for(int i_x = -1000; i_x< 1000; i_x++){
+	void funcao_matematica(unsigned int dominio){
+		this->dominio = dominio;
 
-			float x = (float)i_x/1000;
+		for(int i_x = -250; i_x <= 250; i_x++){
+
+			float x = (float)i_x*this->dominio/250;		// domínio = -dominio <= x <= dominio
 			//float y = x-100*(pow(x,5));									// f(x) = x-100*(x^5)
-			//float y = pow(x,3);											// f(x) = x^3
-			float y = pow(pow(x,2)+pow(x,2)-1,3)-(pow(x,2)*pow(x,3));		// f(x) = (x^2+x^2-1)^3-x^2*x^3
+			float y = pow(x,3);											// f(x) = x^3
+			//float y = pow(pow(x,2)+pow(x,2)-1,3)-(pow(x,2)*pow(x,3));		// f(x) = (x^2+x^2-1)^3-x^2*x^3
 			lista_pontos->push_back(new Ponto(x,y));
 			cout << x << ", " << y << endl;
 		}
+	}
+
+	unsigned int get_dominio(){
+		return this->dominio;
 	}
 };
 
@@ -60,7 +69,7 @@ void display() {
 	glBegin(GL_LINE_STRIP);
 	for(unsigned int j = 0; j< funcoes.lista_pontos->size(); j++){
 		Ponto* atual = funcoes.lista_pontos->at(j);
-			glVertex2f(atual->get_x(),atual->get_y());
+			glVertex2f(atual->get_x()/funcoes.get_dominio(),atual->get_y()/funcoes.get_dominio());
 		}
 	glEnd();
 	glFlush();  // Render now
@@ -74,7 +83,7 @@ int main(int argc, char** argv) {
 	glutInitWindowSize(500, 500);   // Set the window's initial width & height
 	glutInitWindowPosition(100, 100); // Position the window's initial top-left corner
 	funcoes.config_glut();
-	funcoes.funcao_matematica();
+	funcoes.funcao_matematica(4);
 	glutDisplayFunc(display); // Register display callback handler for window re-paint
 	glutMainLoop();           // Enter the infinitely event-processing loop
 	return 0;
