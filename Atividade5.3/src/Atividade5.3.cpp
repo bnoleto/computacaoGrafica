@@ -24,12 +24,15 @@ class Funcoes{
 	void funcao_matematica(unsigned int dominio){
 		this->dominio = dominio;
 
+		lista_pontos->clear();
+
 		for(int i_x = -250; i_x <= 250; i_x++){
 
 			float x = (float)i_x*this->dominio/250;		// domínio = -dominio <= x <= dominio
 			//float y = x-100*(pow(x,5));									// f(x) = x-100*(x^5)
-			float y = pow(x,3);											// f(x) = x^3
-			//float y = pow(pow(x,2)+pow(x,2)-1,3)-(pow(x,2)*pow(x,3));		// f(x) = (x^2+x^2-1)^3-x^2*x^3
+			//float y = pow(x,3);											// f(x) = x^3
+			float y = pow(pow(x,2)+pow(x,2)-1,3)-(pow(x,2)*pow(x,3));		// f(x) = (x^2+x^2-1)^3-x^2*x^3
+
 			lista_pontos->push_back(new Ponto(x,y));
 			cout << x << ", " << y << endl;
 		}
@@ -37,6 +40,10 @@ class Funcoes{
 
 	unsigned int get_dominio(){
 		return this->dominio;
+	}
+
+	void set_dominio(unsigned int valor){
+		this->dominio = valor;
 	}
 };
 
@@ -75,6 +82,18 @@ void display() {
 	glFlush();  // Render now
 }
 
+void teclado (int tecla, int x, int y){
+	if(tecla == GLUT_KEY_UP){
+		funcoes.set_dominio(funcoes.get_dominio()*1.1+1);
+	}
+	if(tecla == GLUT_KEY_DOWN && funcoes.get_dominio()*0.9 >= 1){
+		funcoes.set_dominio(funcoes.get_dominio()*0.9);
+	}
+	funcoes.funcao_matematica(funcoes.get_dominio());
+
+	glutPostRedisplay();
+
+}
 
 /* Main function: GLUT runs as a console application starting at main()  */
 int main(int argc, char** argv) {
@@ -83,8 +102,9 @@ int main(int argc, char** argv) {
 	glutInitWindowSize(500, 500);   // Set the window's initial width & height
 	glutInitWindowPosition(100, 100); // Position the window's initial top-left corner
 	funcoes.config_glut();
-	funcoes.funcao_matematica(4);
+	funcoes.funcao_matematica(1);
 	glutDisplayFunc(display); // Register display callback handler for window re-paint
+	glutSpecialFunc(teclado);
 	glutMainLoop();           // Enter the infinitely event-processing loop
 	return 0;
 }
