@@ -13,23 +13,23 @@ using namespace std;
 
 class Ponto{
 	private:
-		short x,y;
+		float x,y;
 
 	public:
-		Ponto(short x, short y){
+		Ponto(float x, float y){
 			this->x = x;
 			this->y = y;
 		}
 
-		short get_x(){
+		float get_x(){
 			return this->x;
 		}
 
-		short get_y(){
+		float get_y(){
 			return this->y;
 		}
 
-		void set(short x, short y){
+		void set(float x, float y){
 			cout << "(" << this->x << ", " << this->y << ") -> ";
 			this->x = x;
 			this->y = y;
