@@ -12,7 +12,7 @@ class MatrizTransformacao{
 
 	float matriz[3][3];
 	vector<Ponto*>* lista_pontos = nullptr;
-	Ponto centro_massa = Ponto(0,0);
+
 
 	float rad(float angulo){	// converterá de graus para radianos
 		return angulo*3.141592/180;
@@ -35,6 +35,17 @@ class MatrizTransformacao{
 	void calcular_centro_massa(){
 
 
+		float mediaX = 0, mediaY = 0;
+
+		for(unsigned int i = 0; i<lista_pontos->size(); i++){
+			mediaX+=lista_pontos->at(i)->get_x();
+			mediaY+=lista_pontos->at(i)->get_y();
+		}
+
+		mediaX /= lista_pontos->size();
+		mediaY /= lista_pontos->size();
+
+		/*
 		float menorX,menorY,maiorX,maiorY;
 
 		if(lista_pontos->size() > 0){
@@ -60,16 +71,22 @@ class MatrizTransformacao{
 			if(lista_pontos->at(i)->get_y() < menorY){
 				menorY = lista_pontos->at(i)->get_y();
 			}
-		}
-		this->centro_massa = Ponto((menorX+maiorX/2),(menorY+maiorY/2));
+		}*/
+//		this->centro_massa = Ponto((menorX+maiorX/2),(menorY+maiorY/2));
+		this->centro_massa = Ponto(mediaX,mediaY);
 	}
-
 	void aplicar_transformacao(){
-		for(unsigned int i = 0; i <= lista_pontos->size(); i++){	// para cada ponto do conjunto
+		for(unsigned int i = 0; i <= lista_pontos->size()+1; i++){	// para cada ponto do conjunto
 			Ponto* ponto_atual = nullptr;
 
-			if(i ==lista_pontos->size()){	// ajustará o centro de massa no final do laço
+			if(i == lista_pontos->size()){	// ajustará o centro de massa no final do laço
 				ponto_atual = &centro_massa;
+			}
+			else if(i == lista_pontos->size()+1){	// ajustará o centro de massa no final do laço
+				if(removido == nullptr){
+					break;
+				}
+				ponto_atual = removido;
 			}
 			else{
 				ponto_atual = lista_pontos->at(i);
@@ -102,6 +119,8 @@ class MatrizTransformacao{
 	}
 
 	public:
+	Ponto centro_massa = Ponto(250,250);
+	Ponto* removido = nullptr;
 
 	MatrizTransformacao(vector<Ponto*>* pontos){
 		this->lista_pontos = pontos;
@@ -155,7 +174,8 @@ class Funcoes{
 		pontos.push_back(new Ponto(x,y));
 		cout << "Ponto (" << x << ", " << y << ") adicionado!" << endl;
 		excluido = nullptr;
-		matriz = MatrizTransformacao(&pontos);
+		matriz.removido = nullptr;
+		matriz.atualizar_matriz();
 	}
 
 	void remover_ponto(Ponto* ponto){
@@ -167,12 +187,16 @@ class Funcoes{
 
 		for(unsigned int i = pontos.size()-1; i >= 0; i--){		// começará da posição final para priorizar a remoção do ponto criado por último (caso 2 pontos estejam na mesma posição)
 			//if(pontos.at(i)->get_x() == x && pontos.at(i)->get_y() == y){
+			if(pontos.at(i) == ponto){
+				matriz.removido = pontos.at(i);
 				excluido = pontos.at(i);
 //				cout << "Ponto (" << x << ", " << y << ") removido." << endl;
 				pontos.erase(pontos.begin() + i);	// iterador do elemento inicial + posição i
+				matriz.atualizar_matriz();
 				break;
-			//}
+			}
 		}
+
 	}
 
 	vector<Ponto*>* get_pontos(){
@@ -214,7 +238,19 @@ class Funcoes{
 				glVertex2i(excluido->get_x()+3, excluido->get_y()-3);
 				glVertex2i(excluido->get_x()-3, excluido->get_y()+3);
 			glEnd();
-		}
+	}
+
+	void mostrar_centro(){
+		Ponto* excluido = &matriz.centro_massa;
+
+		glColor3ub(0, 255, 255);
+		glBegin(GL_LINE_LOOP);
+			glVertex2i(excluido->get_x()-2, excluido->get_y());
+			glVertex2i(excluido->get_x(), excluido->get_y()+2);
+			glVertex2i(excluido->get_x()+2, excluido->get_y());
+			glVertex2i(excluido->get_x(), excluido->get_y()-2);
+		glEnd();
+	}
 
 	void salvar_arquivo(){
 		fstream arquivo;
@@ -292,6 +328,8 @@ void display() {
 
 	// algoritmo para mostrar a posição do último ponto excluído
 	funcoes.mostrar_excluido();
+
+	funcoes.mostrar_centro();
 
 	glFlush();  // Render now
 }
