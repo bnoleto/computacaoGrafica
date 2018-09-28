@@ -10,6 +10,8 @@ using namespace std;
 class MatrizTransformacao{
 	private:
 
+	float tamanho_figura = 1;
+
 	float matriz[3][3];
 	vector<Ponto*>* lista_pontos = nullptr;
 
@@ -105,9 +107,12 @@ class MatrizTransformacao{
 	}
 
 	void escala(float multiplicador){
-		matriz[0][0] = multiplicador;
-		matriz[1][1] = multiplicador;
-		aplicar_transformacao();
+		if(!(tamanho_figura < 0.01 && multiplicador < 1)){	// condição para impedir de perder os pontos ao deixar a imagem muito pequena
+			tamanho_figura *= multiplicador;
+			matriz[0][0] = multiplicador;
+			matriz[1][1] = multiplicador;
+			aplicar_transformacao();
+		}
 	}
 
 	void rotacao(float angulo){
