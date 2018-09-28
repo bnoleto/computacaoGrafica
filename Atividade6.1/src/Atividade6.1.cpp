@@ -45,34 +45,6 @@ class MatrizTransformacao{
 		mediaX /= lista_pontos->size();
 		mediaY /= lista_pontos->size();
 
-		/*
-		float menorX,menorY,maiorX,maiorY;
-
-		if(lista_pontos->size() > 0){
-			menorX = lista_pontos->at(0)->get_x();
-			menorY = lista_pontos->at(0)->get_y();
-			maiorX = lista_pontos->at(0)->get_x();
-			maiorY = lista_pontos->at(0)->get_y();
-		}
-		else{
-			return;
-		}
-
-		for(unsigned int i = 0; i<lista_pontos->size(); i++){
-			if(lista_pontos->at(i)->get_x() > maiorX){
-				maiorX = lista_pontos->at(i)->get_x();
-			}
-			if(lista_pontos->at(i)->get_x() < menorX){
-				menorX = lista_pontos->at(i)->get_x();
-			}
-			if(lista_pontos->at(i)->get_y() > maiorY){
-				maiorY = lista_pontos->at(i)->get_y();
-			}
-			if(lista_pontos->at(i)->get_y() < menorY){
-				menorY = lista_pontos->at(i)->get_y();
-			}
-		}*/
-//		this->centro_massa = Ponto((menorX+maiorX/2),(menorY+maiorY/2));
 		this->centro_massa = Ponto(mediaX,mediaY);
 	}
 	void aplicar_transformacao(){
@@ -91,8 +63,6 @@ class MatrizTransformacao{
 			else{
 				ponto_atual = lista_pontos->at(i);
 			}
-
-			//cout << ponto_atual->get_x() << endl;
 
 			float matriz_mult[3] = {ponto_atual->get_x(),ponto_atual->get_y(), 1};
 
