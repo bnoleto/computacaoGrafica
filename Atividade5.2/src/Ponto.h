@@ -31,10 +31,10 @@ class Ponto{
 		}
 
 		void set(float x, float y){
-			cout << "(" << this->x << ", " << this->y << ") -> ";
+//			cout << "(" << this->x << ", " << this->y << ") -> ";
 			this->x = x;
 			this->y = y;
-			cout << "(" << this->x << ", " << this->y << ")" << endl;
+//			cout << "(" << this->x << ", " << this->y << ")" << endl;
 		}
 
 		bool operator==(const Ponto& outro){
@@ -49,7 +49,7 @@ class Ponto{
 			float yA = (float)p1->get_y();
 			float yB = (float)y;
 
-			cout << sqrt(pow((xB-xA),2)+pow((yB-yA),2)) << endl;
+//			cout << sqrt(pow((xB-xA),2)+pow((yB-yA),2)) << endl;
 
 			return sqrt(pow((xB-xA),2)+pow((yB-yA),2));
 		}

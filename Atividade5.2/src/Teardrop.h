@@ -55,7 +55,7 @@ public:
 		return pontos;
 	}
 
-	void add_angulo(int incremento,Ponto* centro_massa){
+	void add_angulo(float incremento,Ponto* centro_massa){
 
 		MatrizTransformacao matriz = MatrizTransformacao(pontos, centro_massa);
 

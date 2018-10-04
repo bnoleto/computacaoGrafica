@@ -10,7 +10,9 @@ using namespace std;
 class Funcoes{
 	public:
 	vector<Teardrop*>* lista_teardrop = new vector<Teardrop*>;
-	Ponto* ponto_central;
+	Ponto* ponto_central = new Ponto(250,250);
+	float rotacionando = 0;
+	int contador = 0;
 
 	void config_glut(){
 		glutCreateWindow("Atividade 5.2"); // Create a window with the given title
@@ -19,6 +21,8 @@ class Funcoes{
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // Set background color to black and opaque
 
 		glColor3ub(255, 0, 0);
+
+		novo_cjto_teardrop(1, 30);
 	}
 
 	float rad(float angulo){	// converterá de graus para radianos
@@ -50,7 +54,8 @@ class Funcoes{
 		}
 	}
 
-	void rotacionar(int angulo){
+
+	void rotacionar(float angulo){
 
 		for(unsigned int i = 0; i<lista_teardrop->size(); i++){
 
@@ -64,6 +69,11 @@ class Funcoes{
 Funcoes funcoes; // classe global para as funções do programa
 
 void display() {
+
+	if(funcoes.rotacionando != 0){
+		funcoes.rotacionar(funcoes.rotacionando);
+		glutPostRedisplay();
+	}
 
 	glViewport(0, 0, 500, 500);
 
@@ -82,8 +92,15 @@ void display() {
 }
 
 void mouse(int botao, int estado, int x, int y){
+/*
+	cout << estado << " / " << GLUT_DOWN << endl;
+	cout << funcoes.mouse_pressionado << endl;
+*/
+
 
 	if (estado == GLUT_DOWN){
+
+		/*
 		funcoes.ponto_central = new Ponto(x,y);
 		if(botao == GLUT_LEFT_BUTTON){
 			funcoes.novo_cjto_teardrop(0, 0);
@@ -91,18 +108,32 @@ void mouse(int botao, int estado, int x, int y){
 		}
 		if(botao == GLUT_RIGHT_BUTTON){
 			funcoes.novo_cjto_teardrop(1, 30);
+		}*/
+		if(botao == GLUT_LEFT_BUTTON){
+			funcoes.rotacionando = -0.1;
+		}
+		if(botao == GLUT_RIGHT_BUTTON){
+			funcoes.rotacionando = 0.1;
 		}
 	}
+	else{
+		funcoes.rotacionando = 0;
+	}
+	glutPostRedisplay();
 }
 
 void teclado(unsigned char tecla, int x, int y){
-	if  (tecla == 'r'){
+	/*if  (tecla == 'r'){
 		funcoes.rotacionar(-1);
 	}
 	if  (tecla == 'R'){
 		funcoes.rotacionar(1);
+	}*/
+	/*
+	if(toupper(tecla) == 'R'){
+		funcoes.rotacionando = !funcoes.rotacionando;
 	}
-	glutPostRedisplay();
+	glutPostRedisplay();*/
 }
 
 /* Main function: GLUT runs as a console application starting at main()  */
