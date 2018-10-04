@@ -10,6 +10,7 @@ using namespace std;
 class Funcoes{
 	public:
 	vector<Teardrop*>* lista_teardrop = new vector<Teardrop*>;
+	Ponto* ponto_central;
 
 	void config_glut(){
 		glutCreateWindow("Atividade 5.2"); // Create a window with the given title
@@ -24,7 +25,7 @@ class Funcoes{
 		return angulo*3.141592/180;
 	}
 
-	void novo_cjto_teardrop(int tipo, Ponto* ponto_central){
+	void novo_cjto_teardrop(int tipo, int dist_centro){
 
 		lista_teardrop->clear();
 
@@ -35,24 +36,26 @@ class Funcoes{
 
 			float angulo = i*(360/qtd_teardrops);
 
+			Ponto* p_inicial_teardrop = new Ponto(	// irá se afastar 30 pixels do ponto central
+					x + dist_centro*cos(rad(angulo)),
+					y - dist_centro*sin(rad(angulo))
+			);
+
 			if(tipo == 1){
-
-				Ponto* p_inicial_teardrop = new Ponto(	// irá se afastar 30 pixels do ponto central
-						x + 30*cos(rad(angulo)),
-						y - 30*sin(rad(angulo))
-				);
-
 				lista_teardrop->push_back(new Teardrop(p_inicial_teardrop,30,angulo+90));	// irá rotacionar o teardrop no ângulo atual + 90 graus em relação ao seu ponto inicial
 			}
 			else{
-
-				Ponto* p_inicial_teardrop = new Ponto(
-										x + cos(rad(angulo)),
-										y - sin(rad(angulo))
-								);
-
 				lista_teardrop->push_back(new Teardrop(p_inicial_teardrop,30,angulo));
 			}
+		}
+	}
+
+	void rotacionar(int angulo){
+
+		for(unsigned int i = 0; i<lista_teardrop->size(); i++){
+
+			lista_teardrop->at(i)->add_angulo(angulo,ponto_central);
+
 		}
 	}
 
@@ -81,14 +84,25 @@ void display() {
 void mouse(int botao, int estado, int x, int y){
 
 	if (estado == GLUT_DOWN){
+		funcoes.ponto_central = new Ponto(x,y);
 		if(botao == GLUT_LEFT_BUTTON){
-			funcoes.novo_cjto_teardrop(0, new Ponto(x,y));
+			funcoes.novo_cjto_teardrop(0, 0);
 
 		}
 		if(botao == GLUT_RIGHT_BUTTON){
-			funcoes.novo_cjto_teardrop(1, new Ponto(x,y));
+			funcoes.novo_cjto_teardrop(1, 30);
 		}
 	}
+}
+
+void teclado(unsigned char tecla, int x, int y){
+	if  (tecla == 'r'){
+		funcoes.rotacionar(-1);
+	}
+	if  (tecla == 'R'){
+		funcoes.rotacionar(1);
+	}
+	glutPostRedisplay();
 }
 
 /* Main function: GLUT runs as a console application starting at main()  */
@@ -99,6 +113,7 @@ int main(int argc, char** argv) {
 	glutInitWindowPosition(100, 100); // Position the window's initial top-left corner
 	funcoes.config_glut();
 	glutMouseFunc(mouse);
+	glutKeyboardFunc(teclado);
 	glutDisplayFunc(display); // Register display callback handler for window re-paint
 	glutMainLoop();           // Enter the infinitely event-processing loop
 	return 0;

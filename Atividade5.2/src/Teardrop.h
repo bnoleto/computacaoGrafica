@@ -8,6 +8,7 @@
 #ifndef TEARDROP_H_
 #define TEARDROP_H_
 #include"Ponto.h"
+#include"MatrizTransformacao.h"
 #include<math.h>
 #include<vector>
 
@@ -52,6 +53,25 @@ public:
 
 	vector<Ponto*>* get_pontos(){
 		return pontos;
+	}
+
+	void add_angulo(int incremento,Ponto* centro_massa){
+
+		MatrizTransformacao matriz = MatrizTransformacao(pontos, centro_massa);
+
+		matriz.rotacao(incremento);
+
+	}
+
+	void atualizar(){
+		pontos->clear();
+
+		pontos->push_back(ponto_inicial);
+
+		int x = this->ponto_inicial->get_x(), y = this->ponto_inicial->get_y();
+		this->centro_circunferencia = new Ponto(x + 4*raio*cos(rad(-angulo)), y + 4*raio*sin(rad(-angulo)));
+
+		gerarCircunferencia();
 	}
 
 };
