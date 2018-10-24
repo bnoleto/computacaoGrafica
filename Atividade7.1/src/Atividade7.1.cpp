@@ -1,6 +1,7 @@
 #include <GL/glut.h>  // GLUT, includes glu.h and gl.h
 #include <vector>
 #include "Ponto.h"
+#include "Face.h"
 #include <iostream>
 #include <fstream>
 #include <Math.h>
@@ -13,7 +14,8 @@ class MatrizTransformacao{
 	float tamanho_figura = 1;
 
 	float matriz[4][4];
-	vector<Ponto*>* lista_pontos = nullptr;
+	//vector<Ponto*>* lista_pontos = nullptr;
+	vector<Face*>* lista_faces = nullptr;
 
 	float rad(float angulo){	// converterá de graus para radianos
 		return angulo*3.141592/180;
@@ -33,65 +35,55 @@ class MatrizTransformacao{
 
 	}
 
-	void calcular_centro_massa(){
-
-
-		float mediaX = 0, mediaY = 0;
-
-		for(unsigned int i = 0; i<lista_pontos->size(); i++){
-			mediaX+=lista_pontos->at(i)->get_x();
-			mediaY+=lista_pontos->at(i)->get_y();
-		}
-
-		mediaX /= lista_pontos->size();
-		mediaY /= lista_pontos->size();
-
-		this->centro_massa = Ponto(mediaX,mediaY);
-	}
 	void aplicar_transformacao(){
-		for(unsigned int i = 0; i <= lista_pontos->size()+1; i++){	// para cada ponto do conjunto
-			Ponto* ponto_atual = nullptr;
+		for(unsigned int j = 0; j<lista_faces->size(); j++){
 
-			if(i == lista_pontos->size()){	// ajustará o centro de massa no final do laço
-				ponto_atual = &centro_massa;
-			}
-			else if(i == lista_pontos->size()+1){	// ajustará o centro de massa no final do laço
-				if(removido == nullptr){
-					break;
+			vector<Ponto*>* lista_pontos = lista_faces->at(j)->get_pontos();
+
+			for(unsigned int i = 0; i <= lista_pontos->size()+1; i++){	// para cada ponto do conjunto
+				Ponto* ponto_atual = nullptr;
+
+				if(i == lista_pontos->size()){	// ajustará o centro de massa no final do laço
+					ponto_atual = &centro_massa;
 				}
-				ponto_atual = removido;
+				else if(i == lista_pontos->size()+1){	// ajustará o centro de massa no final do laço
+					if(removido == nullptr){
+						break;
+					}
+					ponto_atual = removido;
+				}
+				else{
+					ponto_atual = lista_pontos->at(i);
+				}
+
+				double matriz_mult[4] = {ponto_atual->get_x(),ponto_atual->get_y(), ponto_atual->get_z(), 1};
+
+				matriz_mult[0] -= centro_massa.get_x();
+				matriz_mult[1] -= centro_massa.get_y();
+				matriz_mult[2] -= centro_massa.get_z();
+
+				float x_final = 0.0;
+				for(int i_matriz = 0; i_matriz < 4; i_matriz++){
+					x_final+= matriz[0][i_matriz] * matriz_mult[i_matriz];
+				}
+
+				float y_final = 0.0;
+				for(int i_matriz = 0; i_matriz < 4; i_matriz++){
+					y_final+= matriz[1][i_matriz] * matriz_mult[i_matriz];
+				}
+
+				float z_final = 0.0;
+				for(int i_matriz = 0; i_matriz < 4; i_matriz++){
+					z_final+= matriz[1][i_matriz] * matriz_mult[i_matriz];
+				}
+
+				x_final += centro_massa.get_x();
+				y_final += centro_massa.get_y();
+				z_final += centro_massa.get_z();
+
+				ponto_atual->set(x_final, y_final, z_final);
+
 			}
-			else{
-				ponto_atual = lista_pontos->at(i);
-			}
-
-			float matriz_mult[4] = {ponto_atual->get_x(),ponto_atual->get_y(), ponto_atual->get_z(), 1};
-
-			matriz_mult[0] -= centro_massa.get_x();
-			matriz_mult[1] -= centro_massa.get_y();
-			matriz_mult[2] -= centro_massa.get_z();
-
-			float x_final = 0.0;
-			for(int i_matriz = 0; i_matriz < 4; i_matriz++){
-				x_final+= matriz[0][i_matriz] * matriz_mult[i_matriz];
-			}
-
-			float y_final = 0.0;
-			for(int i_matriz = 0; i_matriz < 4; i_matriz++){
-				y_final+= matriz[1][i_matriz] * matriz_mult[i_matriz];
-			}
-
-			float z_final = 0.0;
-			for(int i_matriz = 0; i_matriz < 4; i_matriz++){
-				z_final+= matriz[1][i_matriz] * matriz_mult[i_matriz];
-			}
-
-			x_final += centro_massa.get_x();
-			y_final += centro_massa.get_y();
-			z_final += centro_massa.get_z();
-
-			ponto_atual->set(x_final, y_final, z_final);
-
 		}
 		reset();
 	}
@@ -100,10 +92,9 @@ class MatrizTransformacao{
 	Ponto centro_massa = Ponto(250,250,250);
 	Ponto* removido = nullptr;
 
-	MatrizTransformacao(vector<Ponto*>* pontos){
-		this->lista_pontos = pontos;
+	MatrizTransformacao(vector<Face*>* faces){
+		this->lista_faces = faces;
 		reset();
-		calcular_centro_massa();
 	}
 
 	void translacao(float delta_x, float delta_y, float delta_z){
@@ -152,7 +143,6 @@ class MatrizTransformacao{
 
 	void atualizar_matriz(){
 		reset();
-		calcular_centro_massa();
 	}
 
 };
@@ -161,9 +151,10 @@ class Funcoes{
 	private:
 
 	char eixo_rotacao = 'x';
-	vector<Ponto*> pontos;
+	//vector<Ponto*> pontos;
+	vector<Face*> faces;
 	Ponto* excluido = nullptr; //inicial
-	MatrizTransformacao matriz = MatrizTransformacao(&pontos);
+	MatrizTransformacao matriz = MatrizTransformacao(&faces);
 
 	public:
 
@@ -183,17 +174,16 @@ class Funcoes{
 		return this->eixo_rotacao;
 	}
 
-	void adicionar_ponto(double x, double y, double z){
-		pontos.push_back(new Ponto(x,y,z));
+	void adicionar_ponto(double x, double y, double z, Face* face){
+		face->get_pontos()->push_back(new Ponto(x,y,z));
 		cout << "Ponto (" << x << ", " << y << ", " << z << ") adicionado!" << endl;
 		excluido = nullptr;
-		matriz.removido = nullptr;
 		matriz.atualizar_matriz();
 	}
 
-	vector<Ponto*>* get_pontos(){
-			return &this->pontos;
-		}
+	vector<Face*>* get_faces(){
+		return &this->faces;
+	}
 
 	void mostrar_centro(){
 		Ponto* excluido = &matriz.centro_massa;
@@ -206,7 +196,7 @@ class Funcoes{
 			glVertex2i(excluido->get_x(), excluido->get_y()-2);
 		glEnd();
 	}
-
+/*
 	void salvar_arquivo(){
 		fstream arquivo;
 
@@ -220,38 +210,100 @@ class Funcoes{
 
 		cout << "> Arquivo saida.dat salvo!" << endl;
 	}
-
+*/
 	void abrir_arquivo(){
 		fstream arquivo;
 
-		arquivo.open("saida.dat", ios::in);
+		vector<Ponto*> lista_pontos;
+
+		string arquivo_caminho = "obj/Peixe.obj";
+
+		arquivo.open(arquivo_caminho, ios::in);
 		if(arquivo.is_open()){
 
-			pontos.clear();		// vai esvaziar a lista de pontos atual para que sejam criados os pontos a serem importados
+			faces.clear();		// vai esvaziar a lista de pontos atual para que sejam criados os pontos a serem importados
 
 			string linha;
 
 			while(getline(arquivo,linha)){
+
+				int j = 0;
+
 				float x, y, z;
 
 				for(unsigned int i = 0; i< linha.length(); i++){
 					if(linha.at(i) == ' '){
-						x = stod(linha.substr(0, i));		// irá copiar e converter para int a substring dos caracteres na 1ª posição até i
-						y = stod(linha.substr(i+1));		// irá copiar e converter para int a substring dos caracteres da i+1 posição até o final
-						z = stod(linha.substr(i+1));		// irá copiar e converter para int a substring dos caracteres da i+1 posição até o final
-						adicionar_ponto(x, y, z);
-						break;
+						switch(linha.at(i-1)){
+							case 'v' :
+								j=i;
+								j++;
+								while(linha.at(j) != ' '){
+									j++;
+								}
+
+								x = stod(linha.substr(i+1, j-1));
+								cout << x << " ";
+
+								i=j;
+								j++;
+								while(linha.at(j) != ' '){
+									j++;
+								}
+								y = stod(linha.substr(i+1, j-1));
+								cout << y << " ";
+
+								i=j;
+
+								z = stod(linha.substr(i+1));
+								cout << z << endl;
+
+								lista_pontos.push_back(new Ponto(x,y,z));
+
+								break;
+							case 'f' :
+								int valor[3];
+								Face f1 = Face();
+								j=i;
+								j++;
+								while(linha.at(j) != ' '){
+									j++;
+								}
+
+								valor[0] = (stoi(linha.substr(i+1, j-1))) - 1;
+								cout << valor[0] << " ";
+
+								i=j;
+								j++;
+								while(linha.at(j) != ' '){
+									j++;
+								}
+								valor[1] = (stoi(linha.substr(i+1, j-1))) - 1;
+								cout << valor[1] << " ";
+
+								i=j;
+
+								valor[2] = (stoi(linha.substr(i+1))) - 1;
+								cout << valor[2] << endl;
+
+								for(int p = 0; p < 3; p++){
+									f1.get_pontos()->push_back(lista_pontos.at(valor[p]));
+								}
+
+								faces.push_back(&f1);
+
+								break;
+						}
 					}
 				}
 			}
 			arquivo.close();
 
-			cout << "> Arquivo saida.dat importado!" << endl;
+			cout << "> Arquivo " << arquivo_caminho << " importado!" << endl;
 		} else {
 			cout << "> Não foi possível abrir o arquivo saida.dat!" << endl;
 		}
 
-		matriz = MatrizTransformacao(&pontos);
+		matriz = MatrizTransformacao(&faces);
 
 		glutPostRedisplay();
 	}
@@ -266,10 +318,14 @@ void display() {
 
 	glColor3ub(255, 0, 0);
 	glBegin(GL_LINES);
-	if(funcoes.get_pontos()->size() > 1){
-		for(unsigned int i = 1; i<funcoes.get_pontos()->size(); i++){
-			glVertex3d(funcoes.get_pontos()->at(i-1)->get_x(), funcoes.get_pontos()->at(i-1)->get_y(),funcoes.get_pontos()->at(i-1)->get_z());
-			glVertex3d(funcoes.get_pontos()->at(i)->get_x(), funcoes.get_pontos()->at(i)->get_y(), funcoes.get_pontos()->at(i)->get_z());
+	if(funcoes.get_faces()->size() > 1){
+		for(unsigned int i = 1; i<funcoes.get_faces()->size(); i++){
+			Face* face_atual = funcoes.get_faces()->at(i);
+
+			for(unsigned int j = 1; j<face_atual->get_pontos()->size(); j++){
+				glVertex3d(face_atual->get_pontos()->at(j-1)->get_x(), face_atual->get_pontos()->at(j-1)->get_y(), face_atual->get_pontos()->at(j-1)->get_z());
+				glVertex3d(face_atual->get_pontos()->at(j)->get_x(), face_atual->get_pontos()->at(j)->get_y(), face_atual->get_pontos()->at(j)->get_z());
+			}
 		}
 	}
 	glEnd();
