@@ -13,27 +13,33 @@ using namespace std;
 
 class Ponto{
 	private:
-		float x,y;
+		double x,y,z;
 
 	public:
-		Ponto(float x, float y){
+		Ponto(double x, double y, double z){
 			this->x = x;
 			this->y = y;
+			this->z = z;
 		}
 
-		float get_x(){
+		double get_x(){
 			return this->x;
 		}
 
-		float get_y(){
+		double get_y(){
 			return this->y;
 		}
 
-		void set(float x, float y){
-			cout << "(" << this->x << ", " << this->y << ") -> ";
+		double get_z(){
+			return this->z;
+		}
+
+		void set(double x, double y, double z){
+			cout << "(" << this->x << ", " << this->y << ", " << this->z << ") -> ";
 			this->x = x;
 			this->y = y;
-			cout << "(" << this->x << ", " << this->y << ")" << endl;
+			this->z = z;
+			cout << "(" << this->x << ", " << this->y << ", " << this->z << ")" << endl;
 		}
 
 		bool operator==(const Ponto& outro){

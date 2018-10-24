@@ -12,17 +12,16 @@ class MatrizTransformacao{
 
 	float tamanho_figura = 1;
 
-	float matriz[3][3];
+	float matriz[4][4];
 	vector<Ponto*>* lista_pontos = nullptr;
-
 
 	float rad(float angulo){	// converterá de graus para radianos
 		return angulo*3.141592/180;
 	}
 
 	void reset(){
-		for(int i = 0; i<3; i++){
-			for(int j = 0; j<3; j++){
+		for(int i = 0; i<4; i++){
+			for(int j = 0; j<4; j++){
 				if(i == j){
 					matriz[i][j] = 1.0;
 				}
@@ -66,32 +65,39 @@ class MatrizTransformacao{
 				ponto_atual = lista_pontos->at(i);
 			}
 
-			float matriz_mult[3] = {ponto_atual->get_x(),ponto_atual->get_y(), 1};
+			float matriz_mult[4] = {ponto_atual->get_x(),ponto_atual->get_y(), ponto_atual->get_z(), 1};
 
 			matriz_mult[0] -= centro_massa.get_x();
 			matriz_mult[1] -= centro_massa.get_y();
+			matriz_mult[2] -= centro_massa.get_z();
 
 			float x_final = 0.0;
-			for(int i_matriz = 0; i_matriz < 3; i_matriz++){
+			for(int i_matriz = 0; i_matriz < 4; i_matriz++){
 				x_final+= matriz[0][i_matriz] * matriz_mult[i_matriz];
 			}
 
 			float y_final = 0.0;
-			for(int i_matriz = 0; i_matriz < 3; i_matriz++){
+			for(int i_matriz = 0; i_matriz < 4; i_matriz++){
 				y_final+= matriz[1][i_matriz] * matriz_mult[i_matriz];
+			}
+
+			float z_final = 0.0;
+			for(int i_matriz = 0; i_matriz < 4; i_matriz++){
+				z_final+= matriz[1][i_matriz] * matriz_mult[i_matriz];
 			}
 
 			x_final += centro_massa.get_x();
 			y_final += centro_massa.get_y();
+			z_final += centro_massa.get_z();
 
-			ponto_atual->set(x_final, y_final);
+			ponto_atual->set(x_final, y_final, z_final);
 
 		}
 		reset();
 	}
 
 	public:
-	Ponto centro_massa = Ponto(250,250);
+	Ponto centro_massa = Ponto(250,250,250);
 	Ponto* removido = nullptr;
 
 	MatrizTransformacao(vector<Ponto*>* pontos){
@@ -100,9 +106,10 @@ class MatrizTransformacao{
 		calcular_centro_massa();
 	}
 
-	void translacao(float delta_x, float delta_y){
-		matriz[0][2] = delta_x;
-		matriz[1][2] = delta_y;
+	void translacao(float delta_x, float delta_y, float delta_z){
+		matriz[0][3] = delta_x;
+		matriz[1][3] = delta_y;
+		matriz[2][3] = delta_z;
 		aplicar_transformacao();
 	}
 
@@ -111,15 +118,35 @@ class MatrizTransformacao{
 			tamanho_figura *= multiplicador;
 			matriz[0][0] = multiplicador;
 			matriz[1][1] = multiplicador;
+			matriz[2][2] = multiplicador;
 			aplicar_transformacao();
 		}
 	}
 
-	void rotacao(float angulo){
-		matriz[0][0] = cos(rad(angulo));
-		matriz[0][1] = -sin(rad(angulo));
-		matriz[1][0] = sin(rad(angulo));
-		matriz[1][1] = cos(rad(angulo));
+	void rotacao(float angulo, char eixo){
+		switch(toupper(eixo)){
+			case 'X' :
+				matriz[1][1] = cos(rad(angulo));
+				matriz[1][2] = -sin(rad(angulo));
+				matriz[2][1] = sin(rad(angulo));
+				matriz[2][2] = cos(rad(angulo));
+				break;
+			case 'Y' :
+				matriz[0][0] = cos(rad(angulo));
+				matriz[2][0] = -sin(rad(angulo));
+				matriz[0][2] = sin(rad(angulo));
+				matriz[2][2] = cos(rad(angulo));
+				break;
+			case 'Z' :
+				matriz[0][0] = cos(rad(angulo));
+				matriz[0][1] = -sin(rad(angulo));
+				matriz[1][0] = sin(rad(angulo));
+				matriz[1][1] = cos(rad(angulo));
+				break;
+			default:
+				break;
+		}
+
 		aplicar_transformacao();
 	}
 
@@ -133,6 +160,7 @@ class MatrizTransformacao{
 class Funcoes{
 	private:
 
+	char eixo_rotacao = 'x';
 	vector<Ponto*> pontos;
 	Ponto* excluido = nullptr; //inicial
 	MatrizTransformacao matriz = MatrizTransformacao(&pontos);
@@ -145,75 +173,27 @@ class Funcoes{
 		return &this->matriz;
 	}
 
-	void adicionar_ponto(float x, float y){
-		pontos.push_back(new Ponto(x,y));
-		cout << "Ponto (" << x << ", " << y << ") adicionado!" << endl;
+	void set_eixo_rotacao(char entrada){
+		if (entrada == 'X' || entrada == 'Y' || entrada == 'Z'){
+			this->eixo_rotacao = entrada;
+		}
+	}
+
+	char get_eixo_rotacao(){
+		return this->eixo_rotacao;
+	}
+
+	void adicionar_ponto(double x, double y, double z){
+		pontos.push_back(new Ponto(x,y,z));
+		cout << "Ponto (" << x << ", " << y << ", " << z << ") adicionado!" << endl;
 		excluido = nullptr;
 		matriz.removido = nullptr;
 		matriz.atualizar_matriz();
 	}
 
-	void remover_ponto(Ponto* ponto){
-		if(pontos.size() == 0){
-			cout << "Não há nenhum ponto para remover." << endl;
-			return;
-		}
-		//short x = ponto->get_x(), y = ponto->get_y();
-
-		for(unsigned int i = pontos.size()-1; i >= 0; i--){		// começará da posição final para priorizar a remoção do ponto criado por último (caso 2 pontos estejam na mesma posição)
-			//if(pontos.at(i)->get_x() == x && pontos.at(i)->get_y() == y){
-			if(pontos.at(i) == ponto){
-				matriz.removido = pontos.at(i);
-				excluido = pontos.at(i);
-//				cout << "Ponto (" << x << ", " << y << ") removido." << endl;
-				pontos.erase(pontos.begin() + i);	// iterador do elemento inicial + posição i
-				matriz.atualizar_matriz();
-				break;
-			}
-		}
-
-	}
-
 	vector<Ponto*>* get_pontos(){
 			return &this->pontos;
 		}
-
-	float calcularDistancia(Ponto* p1, int x, int y){	// fórmula matemática para calcular a distância entre dois pontos
-		float xA = (float)p1->get_x();
-		float xB = (float)x;
-		float yA = (float)p1->get_y();
-		float yB = (float)y;
-
-		return sqrt(pow((xB-xA),2)+pow((yB-yA),2));
-	}
-
-	Ponto* pontoMaisProx(int x, int y){ // retornará o índice do ponto mais próximo ao clique
-		if(pontos.size() == 0){
-			return NULL;
-		}
-
-		Ponto* ponto_mais_proximo = pontos.at(0); // inicial
-
-		for(unsigned int i = 0; i< pontos.size(); i++){		// o laço irá comparar as distâncias entre cada ponto do vetor e a posição clicada
-			if(calcularDistancia(pontos.at(i), x, y) < calcularDistancia(ponto_mais_proximo, x, y)){
-				ponto_mais_proximo = pontos.at(i);
-			}
-		}
-		return ponto_mais_proximo;
-	}
-
-	void mostrar_excluido(){
-			if(excluido == NULL){
-				return;
-			}
-			glColor3ub(0, 255, 0);
-			glBegin(GL_LINES);
-				glVertex2i(excluido->get_x()-3, excluido->get_y()-3);
-				glVertex2i(excluido->get_x()+3, excluido->get_y()+3);
-				glVertex2i(excluido->get_x()+3, excluido->get_y()-3);
-				glVertex2i(excluido->get_x()-3, excluido->get_y()+3);
-			glEnd();
-	}
 
 	void mostrar_centro(){
 		Ponto* excluido = &matriz.centro_massa;
@@ -244,7 +224,6 @@ class Funcoes{
 	void abrir_arquivo(){
 		fstream arquivo;
 
-
 		arquivo.open("saida.dat", ios::in);
 		if(arquivo.is_open()){
 
@@ -253,13 +232,14 @@ class Funcoes{
 			string linha;
 
 			while(getline(arquivo,linha)){
-				float x, y;
+				float x, y, z;
 
 				for(unsigned int i = 0; i< linha.length(); i++){
 					if(linha.at(i) == ' '){
-						x = stof(linha.substr(0, i));		// irá copiar e converter para int a substring dos caracteres na 1ª posição até i
-						y = stof(linha.substr(i+1));		// irá copiar e converter para int a substring dos caracteres da i+1 posição até o final
-						adicionar_ponto(x, y);
+						x = stod(linha.substr(0, i));		// irá copiar e converter para int a substring dos caracteres na 1ª posição até i
+						y = stod(linha.substr(i+1));		// irá copiar e converter para int a substring dos caracteres da i+1 posição até o final
+						z = stod(linha.substr(i+1));		// irá copiar e converter para int a substring dos caracteres da i+1 posição até o final
+						adicionar_ponto(x, y, z);
 						break;
 					}
 				}
@@ -288,53 +268,38 @@ void display() {
 	glBegin(GL_LINES);
 	if(funcoes.get_pontos()->size() > 1){
 		for(unsigned int i = 1; i<funcoes.get_pontos()->size(); i++){
-			glVertex2i(funcoes.get_pontos()->at(i-1)->get_x(), funcoes.get_pontos()->at(i-1)->get_y());
-			glVertex2i(funcoes.get_pontos()->at(i)->get_x(), funcoes.get_pontos()->at(i)->get_y());
+			glVertex3d(funcoes.get_pontos()->at(i-1)->get_x(), funcoes.get_pontos()->at(i-1)->get_y(),funcoes.get_pontos()->at(i-1)->get_z());
+			glVertex3d(funcoes.get_pontos()->at(i)->get_x(), funcoes.get_pontos()->at(i)->get_y(), funcoes.get_pontos()->at(i)->get_z());
 		}
 	}
 	glEnd();
-
+/*
 	glPointSize(5);
 	glBegin(GL_POINTS);
 		for(unsigned int i = 0; i<funcoes.get_pontos()->size(); i++){
-			glVertex2i(funcoes.get_pontos()->at(i)->get_x(), funcoes.get_pontos()->at(i)->get_y());
+			glVertex3d(funcoes.get_pontos()->at(i)->get_x(), funcoes.get_pontos()->at(i)->get_y());
 		}
 	glEnd();
-
-	// algoritmo para mostrar a posição do último ponto excluído
-	funcoes.mostrar_excluido();
+*/
 
 	funcoes.mostrar_centro();
 
 	glFlush();  // Render now
 }
 
-void mouse(int botao, int estado, int x, int y){
-
-	if (estado == GLUT_DOWN){
-			if(botao == GLUT_LEFT_BUTTON){
-				funcoes.adicionar_ponto(x,y);
-			}
-			if(botao == GLUT_RIGHT_BUTTON){
-				funcoes.remover_ponto(funcoes.pontoMaisProx(x, y));
-			}
-		}
-}
-
 void teclado(unsigned char tecla, int x, int y){
 
-	if(toupper(tecla) == 'S'){
-		funcoes.salvar_arquivo();
-	}
 	if(toupper(tecla) == 'O'){
 		funcoes.abrir_arquivo();
 	}
 
+	funcoes.set_eixo_rotacao(toupper(tecla));
+
 	switch(tecla){
 		case 'e' : funcoes.matriz_transformacao()->escala(0.9); break;
 		case 'E' : funcoes.matriz_transformacao()->escala(1.1); break;
-		case 'r' : funcoes.matriz_transformacao()->rotacao(-5); break;
-		case 'R' : funcoes.matriz_transformacao()->rotacao(5); break;
+		case 'r' : funcoes.matriz_transformacao()->rotacao(-5,funcoes.get_eixo_rotacao()); break;
+		case 'R' : funcoes.matriz_transformacao()->rotacao(5,funcoes.get_eixo_rotacao()); break;
 		default : break;
 	}
 
@@ -345,10 +310,12 @@ void teclado(unsigned char tecla, int x, int y){
 void setas(int tecla, int x, int y){
 
 	switch(tecla){
-		case GLUT_KEY_UP : funcoes.matriz_transformacao()->translacao(0, -5); break;
-		case GLUT_KEY_DOWN : funcoes.matriz_transformacao()->translacao(0, 5); break;
-		case GLUT_KEY_LEFT : funcoes.matriz_transformacao()->translacao(-5, 0); break;
-		case GLUT_KEY_RIGHT : funcoes.matriz_transformacao()->translacao(5, 0); break;
+		case GLUT_KEY_PAGE_UP : funcoes.matriz_transformacao()->translacao(0,0,5); break;
+		case GLUT_KEY_PAGE_DOWN : funcoes.matriz_transformacao()->translacao(0,0,-5); break;
+		case GLUT_KEY_UP : funcoes.matriz_transformacao()->translacao(0, -5, 0); break;
+		case GLUT_KEY_DOWN : funcoes.matriz_transformacao()->translacao(0, 5, 0); break;
+		case GLUT_KEY_LEFT : funcoes.matriz_transformacao()->translacao(-5, 0, 0); break;
+		case GLUT_KEY_RIGHT : funcoes.matriz_transformacao()->translacao(5, 0, 0); break;
 		default : break;
 	}
 
@@ -364,7 +331,6 @@ int main(int argc, char** argv) {
 	glutInitWindowPosition(100, 100); // Position the window's initial top-left corner
 	glutCreateWindow("Atividade 7.1"); // Create a window with the given title
 	gluOrtho2D(0, 500, 500, 0);
-	glutMouseFunc(mouse);
 	glutKeyboardFunc(teclado);
 	glutSpecialFunc(setas);
 	glutDisplayFunc(display); // Register display callback handler for window re-paint
