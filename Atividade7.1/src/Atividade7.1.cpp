@@ -16,6 +16,7 @@ class MatrizTransformacao{
 
 	double matriz[4][4];
 	vector<Face*>* lista_faces = nullptr;
+	vector<Ponto*>* lista_pontos = nullptr;
 	char eixo_atual = 'X';
 
 	double rad(double angulo){	// converterá de graus para radianos
@@ -37,12 +38,16 @@ class MatrizTransformacao{
 	}
 
 	void aplicar_transformacao(){
-		for(unsigned int j = 0; j<lista_faces->size(); j++){
 
-			vector<Ponto*>* lista_pontos = lista_faces->at(j)->get_pontos();
+			for(unsigned int i = 0; i <= lista_pontos->size(); i++){	// para cada ponto do conjunto
+				Ponto* ponto_atual = nullptr;
 
-			for(unsigned int i = 0; i < lista_pontos->size(); i++){	// para cada ponto do conjunto
-				Ponto* ponto_atual = lista_pontos->at(i);
+				if(i == lista_pontos->size()){	// ajustará o centro de massa no final do laço
+					ponto_atual = &centro_massa;
+				}
+				else{
+					ponto_atual = lista_pontos->at(i);
+				}
 
 				double matriz_mult[4] = {ponto_atual->get_x(),ponto_atual->get_y(), ponto_atual->get_z(), 1};
 
@@ -67,18 +72,26 @@ class MatrizTransformacao{
 				ponto_atual->set(x_final, y_final, z_final);
 
 			}
-		}
 		reset();
 	}
 
 	public:
 	Ponto centro_massa = Ponto(0,0,0);
 
-	MatrizTransformacao(vector<Face*>* faces){
+	MatrizTransformacao(vector<Face*>* faces, vector<Ponto*>* pontos){
 		this->lista_faces = faces;
+		this->lista_pontos = pontos;
 		reset();
 	}
+/*
+	void set_lista_pontos(vector<Ponto*>* pontos){
+		this->lista_pontos = pontos;
+	}
 
+	vector<Ponto*>* get_lista_pontos(){
+		return this->lista_pontos;
+	}
+*/
 	void set_eixo(char entrada){
 		if (entrada == 'X' || entrada == 'Y' || entrada == 'Z'){
 			cout << "O eixo agora é " << entrada << "!" << endl;
@@ -140,8 +153,9 @@ class Funcoes{
 	private:
 
 	char eixo_rotacao = 'X';
-	vector<Face*> faces;
-	MatrizTransformacao matriz = MatrizTransformacao(&faces);
+	vector<Face*> lista_faces;
+	vector<Ponto*> lista_pontos;
+	MatrizTransformacao matriz = MatrizTransformacao(&lista_faces, &lista_pontos);
 
 	public:
 
@@ -152,7 +166,7 @@ class Funcoes{
 	}
 
 	vector<Face*>* get_faces(){
-		return &this->faces;
+		return &this->lista_faces;
 	}
 
 	double proximo_double(string entrada, unsigned int* contador){
@@ -212,14 +226,15 @@ class Funcoes{
 	void abrir_arquivo(){
 		fstream arquivo;
 
-		vector<Ponto*> lista_pontos;
+		//vector<Ponto*> lista_pontos;
 
-		string arquivo_caminho = "obj/Caveira.obj";
+		string arquivo_caminho = "obj/dodge_viper.obj";
 
 		arquivo.open(arquivo_caminho, ios::in);
 		if(arquivo.is_open()){
 
-			faces.clear();		// vai esvaziar a lista de pontos atual para que sejam criados os pontos a serem importados
+			lista_faces.clear();		// vai esvaziar a lista de pontos atual para que sejam criados os pontos a serem importados
+			lista_pontos.clear();
 
 			string linha;
 
@@ -256,7 +271,7 @@ class Funcoes{
 									f1->get_pontos()->push_back(lista_pontos.at(valor[p]-1));
 								}
 
-								this->faces.push_back(f1);
+								this->lista_faces.push_back(f1);
 
 								break;
 						}
@@ -265,15 +280,17 @@ class Funcoes{
 			}
 			arquivo.close();
 
-			cout << faces.size() << " faces"<< endl;
-			cout << faces.size()*3 << " pontos"<< endl;
+			cout << lista_faces.size() << " faces"<< endl;
+			cout << lista_faces.size()*3 << " pontos"<< endl;
 
 			cout << "> Arquivo " << arquivo_caminho << " importado!" << endl;
 		} else {
 			cout << "> Não foi possível abrir o arquivo saida.dat!" << endl;
 		}
 
-		matriz = MatrizTransformacao(&faces);
+		//matriz = MatrizTransformacao(&faces, &lista_pontos);
+
+		//matriz.set_lista_pontos(&lista_pontos);
 
 		glutPostRedisplay();
 	}
@@ -352,7 +369,7 @@ int main(int argc, char** argv) {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	int tamanho = 50;
-	glOrtho(-tamanho, tamanho, -tamanho, tamanho, -tamanho, tamanho);
+	glOrtho(-tamanho, tamanho, -tamanho, tamanho, -tamanho*4, tamanho*4);
 	glMatrixMode(GL_MODELVIEW);
 
 	glutKeyboardFunc(teclado);
