@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <Math.h>
+#include <iomanip>
 
 using namespace std;
 
@@ -13,11 +14,11 @@ class MatrizTransformacao{
 
 	float tamanho_figura = 1;
 
-	float matriz[4][4];
-	//vector<Ponto*>* lista_pontos = nullptr;
+	double matriz[4][4];
 	vector<Face*>* lista_faces = nullptr;
+	char eixo_atual = 'X';
 
-	float rad(float angulo){	// converterá de graus para radianos
+	double rad(double angulo){	// converterá de graus para radianos
 		return angulo*3.141592/180;
 	}
 
@@ -40,21 +41,8 @@ class MatrizTransformacao{
 
 			vector<Ponto*>* lista_pontos = lista_faces->at(j)->get_pontos();
 
-			for(unsigned int i = 0; i <= lista_pontos->size()+1; i++){	// para cada ponto do conjunto
-				Ponto* ponto_atual = nullptr;
-
-				if(i == lista_pontos->size()){	// ajustará o centro de massa no final do laço
-					ponto_atual = &centro_massa;
-				}
-				else if(i == lista_pontos->size()+1){	// ajustará o centro de massa no final do laço
-					if(removido == nullptr){
-						break;
-					}
-					ponto_atual = removido;
-				}
-				else{
-					ponto_atual = lista_pontos->at(i);
-				}
+			for(unsigned int i = 0; i < lista_pontos->size(); i++){	// para cada ponto do conjunto
+				Ponto* ponto_atual = lista_pontos->at(i);
 
 				double matriz_mult[4] = {ponto_atual->get_x(),ponto_atual->get_y(), ponto_atual->get_z(), 1};
 
@@ -62,19 +50,14 @@ class MatrizTransformacao{
 				matriz_mult[1] -= centro_massa.get_y();
 				matriz_mult[2] -= centro_massa.get_z();
 
-				float x_final = 0.0;
+
+				double x_final = 0;
+				double y_final = 0;
+				double z_final = 0;
 				for(int i_matriz = 0; i_matriz < 4; i_matriz++){
 					x_final+= matriz[0][i_matriz] * matriz_mult[i_matriz];
-				}
-
-				float y_final = 0.0;
-				for(int i_matriz = 0; i_matriz < 4; i_matriz++){
 					y_final+= matriz[1][i_matriz] * matriz_mult[i_matriz];
-				}
-
-				float z_final = 0.0;
-				for(int i_matriz = 0; i_matriz < 4; i_matriz++){
-					z_final+= matriz[1][i_matriz] * matriz_mult[i_matriz];
+					z_final+= matriz[2][i_matriz] * matriz_mult[i_matriz];
 				}
 
 				x_final += centro_massa.get_x();
@@ -89,22 +72,28 @@ class MatrizTransformacao{
 	}
 
 	public:
-	Ponto centro_massa = Ponto(250,250,250);
-	Ponto* removido = nullptr;
+	Ponto centro_massa = Ponto(0,0,0);
 
 	MatrizTransformacao(vector<Face*>* faces){
 		this->lista_faces = faces;
 		reset();
 	}
 
-	void translacao(float delta_x, float delta_y, float delta_z){
+	void set_eixo(char entrada){
+		if (entrada == 'X' || entrada == 'Y' || entrada == 'Z'){
+			cout << "O eixo agora é " << entrada << "!" << endl;
+			this->eixo_atual = entrada;
+		}
+	}
+
+	void translacao(double delta_x, double delta_y, double delta_z){
 		matriz[0][3] = delta_x;
 		matriz[1][3] = delta_y;
 		matriz[2][3] = delta_z;
 		aplicar_transformacao();
 	}
 
-	void escala(float multiplicador){
+	void escala(double multiplicador){
 		if(!(tamanho_figura < 0.01 && multiplicador < 1)){	// condição para impedir de perder os pontos ao deixar a imagem muito pequena
 			tamanho_figura *= multiplicador;
 			matriz[0][0] = multiplicador;
@@ -114,8 +103,8 @@ class MatrizTransformacao{
 		}
 	}
 
-	void rotacao(float angulo, char eixo){
-		switch(toupper(eixo)){
+	void rotacao(double angulo){
+		switch(eixo_atual){
 			case 'X' :
 				matriz[1][1] = cos(rad(angulo));
 				matriz[1][2] = -sin(rad(angulo));
@@ -134,8 +123,8 @@ class MatrizTransformacao{
 				matriz[1][0] = sin(rad(angulo));
 				matriz[1][1] = cos(rad(angulo));
 				break;
-			default:
-				break;
+
+			default : break;
 		}
 
 		aplicar_transformacao();
@@ -150,10 +139,8 @@ class MatrizTransformacao{
 class Funcoes{
 	private:
 
-	char eixo_rotacao = 'x';
-	//vector<Ponto*> pontos;
+	char eixo_rotacao = 'X';
 	vector<Face*> faces;
-	Ponto* excluido = nullptr; //inicial
 	MatrizTransformacao matriz = MatrizTransformacao(&faces);
 
 	public:
@@ -164,59 +151,70 @@ class Funcoes{
 		return &this->matriz;
 	}
 
-	void set_eixo_rotacao(char entrada){
-		if (entrada == 'X' || entrada == 'Y' || entrada == 'Z'){
-			this->eixo_rotacao = entrada;
-		}
-	}
-
-	char get_eixo_rotacao(){
-		return this->eixo_rotacao;
-	}
-
-	void adicionar_ponto(double x, double y, double z, Face* face){
-		face->get_pontos()->push_back(new Ponto(x,y,z));
-		cout << "Ponto (" << x << ", " << y << ", " << z << ") adicionado!" << endl;
-		excluido = nullptr;
-		matriz.atualizar_matriz();
-	}
-
 	vector<Face*>* get_faces(){
 		return &this->faces;
 	}
 
-	void mostrar_centro(){
-		Ponto* excluido = &matriz.centro_massa;
+	double proximo_double(string entrada, unsigned int* contador){
 
-		glColor3ub(0, 255, 255);
-		glBegin(GL_LINE_LOOP);
-			glVertex2i(excluido->get_x()-2, excluido->get_y());
-			glVertex2i(excluido->get_x(), excluido->get_y()+2);
-			glVertex2i(excluido->get_x()+2, excluido->get_y());
-			glVertex2i(excluido->get_x(), excluido->get_y()-2);
-		glEnd();
-	}
-/*
-	void salvar_arquivo(){
-		fstream arquivo;
+		string saida;
 
-		arquivo.open("saida.dat", ios::out);
+		unsigned int i = *contador;
 
-		for(unsigned int i = 0; i<pontos.size(); i++){
-			arquivo << pontos.at(i)->get_x() << " " << pontos.at(i)->get_y() << ((i == pontos.size()-1) ? "" : "\n");
+		while(!(isdigit(entrada.at(i)) || entrada.at(i) == '-')){
+			i++;
+		}
+		while(i<entrada.length()){
+			if(isdigit(entrada.at(i)) || entrada.at(i) == '-' || entrada.at(i) == '.'){
+				saida+=entrada.at(i);
+				i++;
+			}else{
+				while(i<entrada.length() && entrada.at(i) != ' '){
+					i++;
+				}
+
+				break;
+			}
 		}
 
-		arquivo.close();
+		*contador = i;
 
-		cout << "> Arquivo saida.dat salvo!" << endl;
+		return stod(saida);
 	}
-*/
+
+	int proximo_int(string entrada, unsigned int* contador){
+
+		string saida;
+
+		unsigned int i = *contador;
+
+		while(!isdigit(entrada.at(i))){
+			i++;
+		}
+		while(i<entrada.length()){
+			if(isdigit(entrada.at(i))){
+				saida+=entrada.at(i);
+				i++;
+			}else{
+				while(i<entrada.length() && entrada.at(i) != ' '){
+					i++;
+				}
+
+				break;
+			}
+		}
+
+		*contador = i;
+
+		return stoi(saida);
+	}
+
 	void abrir_arquivo(){
 		fstream arquivo;
 
 		vector<Ponto*> lista_pontos;
 
-		string arquivo_caminho = "obj/Peixe.obj";
+		string arquivo_caminho = "obj/Caveira.obj";
 
 		arquivo.open(arquivo_caminho, ios::in);
 		if(arquivo.is_open()){
@@ -229,67 +227,36 @@ class Funcoes{
 
 				int j = 0;
 
-				float x, y, z;
+				double x, y, z;
 
 				for(unsigned int i = 0; i< linha.length(); i++){
 					if(linha.at(i) == ' '){
 						switch(linha.at(i-1)){
 							case 'v' :
 								j=i;
-								j++;
-								while(linha.at(j) != ' '){
-									j++;
-								}
 
-								x = stod(linha.substr(i+1, j-1));
-								cout << x << " ";
-
-								i=j;
-								j++;
-								while(linha.at(j) != ' '){
-									j++;
-								}
-								y = stod(linha.substr(i+1, j-1));
-								cout << y << " ";
-
-								i=j;
-
-								z = stod(linha.substr(i+1));
-								cout << z << endl;
+								x = proximo_double(linha.substr(j), &i);
+								y = proximo_double(linha.substr(j), &i);
+								z = proximo_double(linha.substr(j), &i);
 
 								lista_pontos.push_back(new Ponto(x,y,z));
 
 								break;
 							case 'f' :
 								int valor[3];
-								Face f1 = Face();
+
 								j=i;
-								j++;
-								while(linha.at(j) != ' '){
-									j++;
-								}
 
-								valor[0] = (stoi(linha.substr(i+1, j-1))) - 1;
-								cout << valor[0] << " ";
-
-								i=j;
-								j++;
-								while(linha.at(j) != ' '){
-									j++;
-								}
-								valor[1] = (stoi(linha.substr(i+1, j-1))) - 1;
-								cout << valor[1] << " ";
-
-								i=j;
-
-								valor[2] = (stoi(linha.substr(i+1))) - 1;
-								cout << valor[2] << endl;
+								Face* f1 = new Face();
+								valor[0] = proximo_int(linha.substr(j), &i);
+								valor[1] = proximo_int(linha.substr(j), &i);
+								valor[2] = proximo_int(linha.substr(j), &i);
 
 								for(int p = 0; p < 3; p++){
-									f1.get_pontos()->push_back(lista_pontos.at(valor[p]));
+									f1->get_pontos()->push_back(lista_pontos.at(valor[p]-1));
 								}
 
-								faces.push_back(&f1);
+								this->faces.push_back(f1);
 
 								break;
 						}
@@ -297,6 +264,9 @@ class Funcoes{
 				}
 			}
 			arquivo.close();
+
+			cout << faces.size() << " faces"<< endl;
+			cout << faces.size()*3 << " pontos"<< endl;
 
 			cout << "> Arquivo " << arquivo_caminho << " importado!" << endl;
 		} else {
@@ -312,35 +282,26 @@ class Funcoes{
 Funcoes funcoes; // classe global para as funções do programa
 
 void display() {
-
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // Set background color to black and opaque
+
 	glClear(GL_COLOR_BUFFER_BIT);         // Clear the color buffer
 
 	glColor3ub(255, 0, 0);
-	glBegin(GL_LINES);
 	if(funcoes.get_faces()->size() > 1){
-		for(unsigned int i = 1; i<funcoes.get_faces()->size(); i++){
+		for(unsigned int i = 0; i<funcoes.get_faces()->size(); i++){
+			glBegin(GL_LINE_LOOP);
+
 			Face* face_atual = funcoes.get_faces()->at(i);
 
-			for(unsigned int j = 1; j<face_atual->get_pontos()->size(); j++){
-				glVertex3d(face_atual->get_pontos()->at(j-1)->get_x(), face_atual->get_pontos()->at(j-1)->get_y(), face_atual->get_pontos()->at(j-1)->get_z());
+			for(unsigned int j = 0; j<face_atual->get_pontos()->size(); j++){
 				glVertex3d(face_atual->get_pontos()->at(j)->get_x(), face_atual->get_pontos()->at(j)->get_y(), face_atual->get_pontos()->at(j)->get_z());
 			}
+
+			glEnd();
 		}
 	}
-	glEnd();
-/*
-	glPointSize(5);
-	glBegin(GL_POINTS);
-		for(unsigned int i = 0; i<funcoes.get_pontos()->size(); i++){
-			glVertex3d(funcoes.get_pontos()->at(i)->get_x(), funcoes.get_pontos()->at(i)->get_y());
-		}
-	glEnd();
-*/
 
-	funcoes.mostrar_centro();
-
-	glFlush();  // Render now
+	glutSwapBuffers();
 }
 
 void teclado(unsigned char tecla, int x, int y){
@@ -349,13 +310,13 @@ void teclado(unsigned char tecla, int x, int y){
 		funcoes.abrir_arquivo();
 	}
 
-	funcoes.set_eixo_rotacao(toupper(tecla));
+	funcoes.matriz_transformacao()->set_eixo(toupper(tecla));
 
 	switch(tecla){
 		case 'e' : funcoes.matriz_transformacao()->escala(0.9); break;
 		case 'E' : funcoes.matriz_transformacao()->escala(1.1); break;
-		case 'r' : funcoes.matriz_transformacao()->rotacao(-5,funcoes.get_eixo_rotacao()); break;
-		case 'R' : funcoes.matriz_transformacao()->rotacao(5,funcoes.get_eixo_rotacao()); break;
+		case 'r' : funcoes.matriz_transformacao()->rotacao(-1); break;
+		case 'R' : funcoes.matriz_transformacao()->rotacao(1); break;
 		default : break;
 	}
 
@@ -368,8 +329,8 @@ void setas(int tecla, int x, int y){
 	switch(tecla){
 		case GLUT_KEY_PAGE_UP : funcoes.matriz_transformacao()->translacao(0,0,5); break;
 		case GLUT_KEY_PAGE_DOWN : funcoes.matriz_transformacao()->translacao(0,0,-5); break;
-		case GLUT_KEY_UP : funcoes.matriz_transformacao()->translacao(0, -5, 0); break;
-		case GLUT_KEY_DOWN : funcoes.matriz_transformacao()->translacao(0, 5, 0); break;
+		case GLUT_KEY_UP : funcoes.matriz_transformacao()->translacao(0, 5, 0); break;
+		case GLUT_KEY_DOWN : funcoes.matriz_transformacao()->translacao(0, -5, 0); break;
 		case GLUT_KEY_LEFT : funcoes.matriz_transformacao()->translacao(-5, 0, 0); break;
 		case GLUT_KEY_RIGHT : funcoes.matriz_transformacao()->translacao(5, 0, 0); break;
 		default : break;
@@ -382,11 +343,18 @@ void setas(int tecla, int x, int y){
 /* Main function: GLUT runs as a console application starting at main()  */
 int main(int argc, char** argv) {
 	glutInit(&argc, argv);                 // Initialize GLUT
-	glutInitDisplayMode(GLUT_SINGLE|GLUT_RGB);
+	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
 	glutInitWindowSize(500, 500);   // Set the window's initial width & height
+	//glViewport(0, 0, 500, 500);
 	glutInitWindowPosition(100, 100); // Position the window's initial top-left corner
 	glutCreateWindow("Atividade 7.1"); // Create a window with the given title
-	gluOrtho2D(0, 500, 500, 0);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	int tamanho = 50;
+	glOrtho(-tamanho, tamanho, -tamanho, tamanho, -tamanho, tamanho);
+	glMatrixMode(GL_MODELVIEW);
+
 	glutKeyboardFunc(teclado);
 	glutSpecialFunc(setas);
 	glutDisplayFunc(display); // Register display callback handler for window re-paint

@@ -35,11 +35,11 @@ class Ponto{
 		}
 
 		void set(double x, double y, double z){
-			cout << "(" << this->x << ", " << this->y << ", " << this->z << ") -> ";
+			//cout << "(" << this->x << ", " << this->y << ", " << this->z << ") -> ";
 			this->x = x;
 			this->y = y;
 			this->z = z;
-			cout << "(" << this->x << ", " << this->y << ", " << this->z << ")" << endl;
+			//cout << "(" << this->x << ", " << this->y << ", " << this->z << ")" << endl;
 		}
 
 		bool operator==(const Ponto& outro){
