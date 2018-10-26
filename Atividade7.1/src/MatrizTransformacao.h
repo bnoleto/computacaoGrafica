@@ -12,7 +12,7 @@ class MatrizTransformacao{
 
 	double matriz[4][4];
 	vector<Ponto*>* lista_pontos = nullptr;
-	Ponto *centro_massa;
+	Ponto *centro_massa = nullptr;
 	char eixo_atual = 'X';
 
 	double rad(double angulo){	// converterá de graus para radianos

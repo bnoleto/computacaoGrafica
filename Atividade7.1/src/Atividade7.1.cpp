@@ -138,6 +138,7 @@ class Funcoes{
 									f1->get_pontos()->push_back(lista_pontos->at(valor.at(p)-1));
 								}
 
+
 								lista_faces->push_back(f1);
 
 								break;
@@ -145,6 +146,9 @@ class Funcoes{
 					}
 				}
 			}
+
+			mesh_principal.calcular_centro_massa();
+
 			arquivo.close();
 
 			cout << lista_faces->size() << " faces"<< endl;
@@ -167,6 +171,7 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT);         // Clear the color buffer
 
 	funcoes.mesh_principal.imprimir();
+	funcoes.mesh_principal.imprimir_centro_massa();
 
 	glutSwapBuffers();
 }
