@@ -3,6 +3,7 @@
 
 #include<vector>
 #include<Math.h>
+#include"Face.h"
 
 class MatrizTransformacao{
 	private:
@@ -10,10 +11,8 @@ class MatrizTransformacao{
 	float tamanho_figura = 1;
 
 	double matriz[4][4];
-	vector<Face*>* lista_faces = nullptr;
 	vector<Ponto*>* lista_pontos = nullptr;
 	Ponto *centro_massa;
-	Ponto centro_tela = Ponto(0,0,0);
 	char eixo_atual = 'X';
 
 	double rad(double angulo){	// converterá de graus para radianos
@@ -68,8 +67,7 @@ class MatrizTransformacao{
 
 	public:
 
-	MatrizTransformacao(vector<Face*>* faces, vector<Ponto*>* pontos, Ponto* centro_massa){
-		this->lista_faces = faces;
+	MatrizTransformacao(vector<Ponto*>* pontos, Ponto* centro_massa){
 		this->lista_pontos = pontos;
 		this->centro_massa = centro_massa;
 		reset();
@@ -86,8 +84,6 @@ class MatrizTransformacao{
 		matriz[0][3] = delta_x;
 		matriz[1][3] = delta_y;
 		matriz[2][3] = delta_z;
-
-		centro_tela.set(delta_x, delta_y, delta_z);
 
 		aplicar_transformacao();
 	}
@@ -127,9 +123,6 @@ class MatrizTransformacao{
 		aplicar_transformacao();
 	}
 
-	void atualizar_matriz(){
-		reset();
-	}
 };
 
 #endif /* MATRIZTRANSFORMACAO_H_ */

@@ -13,10 +13,6 @@ class Face{
 
 	public:
 
-	Face(vector<Ponto*>* pontos){
-		this->lista_pontos = pontos;
-	}
-
 	Face(){
 		this->lista_pontos = new vector<Ponto*>;
 	}

@@ -1,31 +1,15 @@
 #include <GL/glut.h>  // GLUT, includes glu.h and gl.h
 #include <vector>
-#include "Ponto.h"
-#include "Face.h"
 #include "MatrizTransformacao.h"
 #include "Mesh.h"
 #include <iostream>
 #include <fstream>
-#include <iomanip>
 
 using namespace std;
 
 class Funcoes{
-	public:
+	private:
 
-	Mesh mesh_principal;
-	char eixo_rotacao = 'X';
-
-//	unsigned char point_size = 5;
-/*
-	MatrizTransformacao* matriz_transformacao(){
-		return &this->matriz;
-	}
-
-	vector<Face*>* get_faces(){
-		return &this->lista_faces;
-	}
-*/
 	double proximo_double(string entrada, unsigned int* contador){
 
 		string saida;
@@ -59,31 +43,50 @@ class Funcoes{
 
 		unsigned int i = *contador;
 
-		while(!isdigit(entrada.at(i))){
-			i++;
-		}
-		while(i<entrada.length()){
-			if(isdigit(entrada.at(i))){
+		if(i<entrada.length()){
+			while(i<entrada.length() && !isdigit(entrada.at(i))){
+				i++;
+			}
+			while(i<entrada.length() && isdigit(entrada.at(i))){
 				saida+=entrada.at(i);
 				i++;
-			}else{
-				while(i<entrada.length() && entrada.at(i) != ' '){
-					i++;
-				}
-
-				break;
 			}
-		}
+			while(i<entrada.length() && entrada.at(i) != ' '){
+				i++;
+			}
+			*contador = i;
 
-		*contador = i;
+		} else{
+			return -1;
+		}
 
 		return stoi(saida);
 	}
 
+	public:
+
+	Mesh mesh_principal;
+	char eixo_rotacao = 'X';
+	string arquivo_caminho = "obj/dino.obj";
+
+	void config_glut(){
+			glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
+			int altura = 720;
+			int largura = 480;
+			double aspecto = (double)altura/largura;
+			glutInitWindowSize(altura, largura);   // Set the window's initial width & height
+			glutInitWindowPosition(100, 100); // Position the window's initial top-left corner
+			glutCreateWindow("Atividade 7.1"); // Create a window with the given title
+
+			glMatrixMode(GL_PROJECTION);
+			glLoadIdentity();
+			int tamanho = 100;
+
+			glOrtho(-tamanho*aspecto, tamanho*aspecto, -tamanho, tamanho, -tamanho*4, tamanho*4);
+	}
+
 	void abrir_arquivo(){
 		fstream arquivo;
-
-		string arquivo_caminho = "obj/dodge_viper.obj";
 
 		arquivo.open(arquivo_caminho, ios::in);
 		if(arquivo.is_open()){
@@ -115,17 +118,24 @@ class Funcoes{
 
 								break;
 							case 'f' :
-								int valor[3];
+								vector<int> valor;
 
 								j=i;
 
 								Face* f1 = new Face();
-								valor[0] = proximo_int(linha.substr(j), &i);
-								valor[1] = proximo_int(linha.substr(j), &i);
-								valor[2] = proximo_int(linha.substr(j), &i);
 
-								for(int p = 0; p < 3; p++){
-									f1->get_pontos()->push_back(lista_pontos->at(valor[p]-1));
+								while(i < linha.size()){
+									int proximo = proximo_int(linha.substr(j), &i);
+
+									if(proximo == -1){
+										break;
+									} else{
+										valor.push_back(proximo);
+									}
+								}
+
+								for(unsigned int p = 0; p < valor.size(); p++){
+									f1->get_pontos()->push_back(lista_pontos->at(valor.at(p)-1));
 								}
 
 								lista_faces->push_back(f1);
@@ -138,11 +148,11 @@ class Funcoes{
 			arquivo.close();
 
 			cout << lista_faces->size() << " faces"<< endl;
-			cout << lista_faces->size()*3 << " pontos"<< endl;
+			cout << lista_pontos->size() << " pontos"<< endl;
 
 			cout << "> Arquivo " << arquivo_caminho << " importado!" << endl;
 		} else {
-			cout << "> Não foi possível abrir o arquivo saida.dat!" << endl;
+			cout << "> Não foi possível abrir o arquivo " << arquivo_caminho << endl;
 		}
 
 		glutPostRedisplay();
@@ -156,22 +166,7 @@ void display() {
 
 	glClear(GL_COLOR_BUFFER_BIT);         // Clear the color buffer
 
-	Mesh* mesh_atual = &funcoes.mesh_principal;
-
-	glColor3ub(255, 0, 0);
-	if(mesh_atual->get_lista_faces()->size() > 1){
-		for(unsigned int i = 0; i<mesh_atual->get_lista_faces()->size(); i++){
-			Face* face_atual = mesh_atual->get_lista_faces()->at(i);
-
-			glBegin(GL_LINE_STRIP);
-
-			for(unsigned int j = 0; j<face_atual->get_pontos()->size(); j++){
-				glVertex3d(face_atual->get_pontos()->at(j)->get_x(), face_atual->get_pontos()->at(j)->get_y(), face_atual->get_pontos()->at(j)->get_z());
-			}
-
-			glEnd();
-		}
-	}
+	funcoes.mesh_principal.imprimir();
 
 	glutSwapBuffers();
 }
@@ -180,6 +175,7 @@ void teclado(unsigned char tecla, int x, int y){
 
 	if(toupper(tecla) == 'O'){
 		funcoes.abrir_arquivo();
+		return;
 	}
 
 	MatrizTransformacao* matriz = funcoes.mesh_principal.get_matriz_transformacao();
@@ -218,20 +214,8 @@ void setas(int tecla, int x, int y){
 /* Main function: GLUT runs as a console application starting at main()  */
 int main(int argc, char** argv) {
 	glutInit(&argc, argv);                 // Initialize GLUT
-	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
 
-	int altura = 720;
-	int largura = 480;
-	double aspecto = (double)altura/largura;
-	glutInitWindowSize(altura, largura);   // Set the window's initial width & height
-	glutInitWindowPosition(100, 100); // Position the window's initial top-left corner
-	glutCreateWindow("Atividade 7.1"); // Create a window with the given title
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	int tamanho = 100;
-
-	glOrtho(-tamanho*aspecto, tamanho*aspecto, -tamanho, tamanho, -tamanho*4, tamanho*4);
+	funcoes.config_glut();
 
 	glutKeyboardFunc(teclado);
 	glutSpecialFunc(setas);
