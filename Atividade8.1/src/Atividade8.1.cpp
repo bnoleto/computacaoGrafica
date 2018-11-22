@@ -2,6 +2,7 @@
 #include <vector>
 #include "MatrizTransformacao.h"
 #include "Mesh.h"
+#include "Camera.h"
 #include <iostream>
 #include <fstream>
 
@@ -67,9 +68,10 @@ class Funcoes{
 
 	Mesh mesh_principal;
 	char eixo_rotacao = 'X';
-	string arquivo_caminho = "obj/dino.obj";
+	Camera *camera = nullptr;
 
 	void config_glut(){
+
 			glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
 			int altura = 720;
 			int largura = 480;
@@ -78,19 +80,33 @@ class Funcoes{
 			glutInitWindowPosition(100, 100); // Position the window's initial top-left corner
 			glutCreateWindow("Atividade 7.1"); // Create a window with the given title
 
+			camera = new Camera(new Ponto(50,0,200),new Ponto(0,0,0),new Ponto(0,10,0),45,aspecto,0,0);
+
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
 			int tamanho = 100;
 
 			//glOrtho(-tamanho*aspecto, tamanho*aspecto, -tamanho, tamanho, -tamanho*4, tamanho*4);
-			gluPerspective(45, aspecto, 20, 1000);
+			gluPerspective(45, aspecto, 0, 1000);
 
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity();
-			gluLookAt(0, 0, 100, 0, 0, 0, 0, 10, 0);
+			gluLookAt(
+					camera->getOlho()->get_x(),
+					camera->getOlho()->get_y(),
+					camera->getOlho()->get_z(),
+					camera->getLook()->get_x(),
+					camera->getLook()->get_y(),
+					camera->getLook()->get_z(),
+					camera->getUp()->get_x(),
+					camera->getUp()->get_y(),
+					camera->getUp()->get_z()
+			);
+
+			abrir_arquivo("obj/dodge_viper.obj");
 	}
 
-	void abrir_arquivo(){
+	void abrir_arquivo(string arquivo_caminho){
 		fstream arquivo;
 
 		arquivo.open(arquivo_caminho, ios::in);
@@ -184,7 +200,7 @@ void display() {
 }
 
 void teclado(unsigned char tecla, int x, int y){
-
+/*
 	if(toupper(tecla) == 'O'){
 		funcoes.abrir_arquivo();
 		return;
@@ -193,12 +209,17 @@ void teclado(unsigned char tecla, int x, int y){
 	MatrizTransformacao* matriz = funcoes.mesh_principal.get_matriz_transformacao();
 
 	matriz->set_eixo(toupper(tecla));
-
+*/
 	switch(tecla){
-		case 'e' : matriz->escala(0.9); break;
-		case 'E' : matriz->escala(1.1); break;
-		case 'r' : matriz->rotacao(-1); break;
-		case 'R' : matriz->rotacao(1); break;
+		case 'z' : funcoes.camera->aproximar(-1); break;
+		case 'Z' : funcoes.camera->aproximar(1); break;
+	/*	case 'p' : funcoes.camera->pitch(1); break;
+		case 'P' : funcoes.camera->pitch(1); break;
+		case 'r' : funcoes.camera->roll(1); break;
+		case 'R' : funcoes.camera->roll(1); break;
+		case 'y' : funcoes.camera->yaw(1); break;
+		case 'Y' : funcoes.camera->yaw(1); break;*/
+		default: break;
 	}
 
 	glutPostRedisplay();
@@ -206,7 +227,7 @@ void teclado(unsigned char tecla, int x, int y){
 }
 
 void setas(int tecla, int x, int y){
-
+/*
 	MatrizTransformacao* matriz = funcoes.mesh_principal.get_matriz_transformacao();
 
 	switch(tecla){
@@ -220,7 +241,7 @@ void setas(int tecla, int x, int y){
 	}
 
 	glutPostRedisplay();
-
+*/
 }
 
 /* Main function: GLUT runs as a console application starting at main()  */
