@@ -78,7 +78,7 @@ class Funcoes{
 			double aspecto = (double)altura/largura;
 			glutInitWindowSize(altura, largura);   // Set the window's initial width & height
 			glutInitWindowPosition(100, 100); // Position the window's initial top-left corner
-			glutCreateWindow("Atividade 7.1"); // Create a window with the given title
+			glutCreateWindow("Atividade 8.1"); // Create a window with the given title
 
 			camera = new Camera(new Ponto(50,0,200),new Ponto(0,0,0),new Ponto(0,10,0),45,aspecto,0,0);
 
