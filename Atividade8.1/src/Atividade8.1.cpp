@@ -80,7 +80,11 @@ class Funcoes{
 			glutInitWindowPosition(100, 100); // Position the window's initial top-left corner
 			glutCreateWindow("Atividade 8.1"); // Create a window with the given title
 
-			camera = new Camera(new Ponto(50,0,200),new Ponto(0,0,0),new Ponto(0,10,0),45,aspecto,0,0);
+			camera = new Camera(
+					new Vetor3(new Ponto(50,0,200), 0,0,0),
+					new Ponto(0,0,0),
+					new Vetor(new Ponto(0,10,0), 0,0,0),
+					45,aspecto,0,0);
 
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
@@ -211,8 +215,8 @@ void teclado(unsigned char tecla, int x, int y){
 	matriz->set_eixo(toupper(tecla));
 */
 	switch(tecla){
-		case 'z' : funcoes.camera->aproximar(-1); break;
-		case 'Z' : funcoes.camera->aproximar(1); break;
+		case 'z' : funcoes.camera->slide(-1,0,0); break;
+		case 'Z' : funcoes.camera->slide(-1,0,0); break;
 	/*	case 'p' : funcoes.camera->pitch(1); break;
 		case 'P' : funcoes.camera->pitch(1); break;
 		case 'r' : funcoes.camera->roll(1); break;

@@ -14,7 +14,7 @@ class Camera{
 
 	public:
 
-	Camera(Ponto* olho, Ponto* look,Vetor* up, double angulo, double aspecto, double nearDist, double farDist){
+	Camera(Vetor3* olho, Ponto* look,Vetor* up, double angulo, double aspecto, double nearDist, double farDist){
 		this->olho = olho;
 		this->look = look;
 		this->up = up;
@@ -25,7 +25,7 @@ class Camera{
 	}
 
 	Ponto* getOlho(){
-		return this->olho;
+		return olho->get_origem();
 	}
 
 	Ponto* getLook(){
@@ -33,7 +33,7 @@ class Camera{
 	}
 
 	Ponto* getUp(){
-		return this->up;
+		return this->up->get_origem();
 	}
 
 	void atualizarCamera(){
@@ -54,11 +54,22 @@ class Camera{
 		Vetor *u = olho->get_u();
 		Vetor *v = olho->get_v();
 		Vetor *n = olho->get_n();
+
+		n = new Vetor(olho->get_origem(),
+				olho->get_origem()->get_x() - look->get_x(),
+				olho->get_origem()->get_y() - look->get_y(),
+				olho->get_origem()->get_z() - look->get_z());
+		u = up->produtoVetorial(n);
+
+		n->normalizar();
+		u->normalizar();
+
+		v = n->produtoVetorial(u);
 	}
 
 	void setModelViewMatrix(){
 
-		Vetor *eVec = new Vetor(this->olho, olho->get_origem()->get_x(), olho->get_origem()->get_y(), olho->get_origem()->get_z());
+		Vetor *eVec = new Vetor(olho->get_origem(), olho->get_origem()->get_x(), olho->get_origem()->get_y(), olho->get_origem()->get_z());
 
 		float m[16];
 
@@ -74,12 +85,19 @@ class Camera{
 	    glLoadMatrixf(m);
 	}
 
-	void aproximar(double valor){
-/*
-		olho->set(0, 0, olho->get_z()+valor);
-		cout << olho->get_z() << endl;
-*/
-		atualizarCamera();
+	void slide(double delU, double delV, double delN){
+
+		Vetor *u = olho->get_u();
+		Vetor *v = olho->get_v();
+		Vetor *n = olho->get_n();
+
+		olho->get_origem()->set(
+				olho->get_origem()->get_x() + delU * u->get_x() + delV * v->get_x() + delN * n->get_x(),
+				olho->get_origem()->get_y() + delU * u->get_y() + delV * v->get_y() + delN * n->get_y(),
+				olho->get_origem()->get_z() + delU * u->get_z() + delV * v->get_z() + delN * n->get_z()
+				);
+
+		setModelViewMatrix();
 	}
 };
 

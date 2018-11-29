@@ -7,7 +7,7 @@ class Vetor {
 
 	private :
 
-		double x, y, z;
+		double x = 0, y = 0, z = 0;
 		Ponto *origem;
 
 	public :
@@ -50,7 +50,7 @@ class Vetor {
 		double novo_y = (matriz[0][1]*matriz[1][2]*matriz[2][3]) + (matriz[0][4]*matriz[1][3]*matriz[2][2]);
 		double novo_z = (matriz[0][2]*matriz[1][3]*matriz[2][4]) + (matriz[0][2]*matriz[1][1]*matriz[2][0]);
 
-		return Vetor(novo_x, novo_y, novo_z);
+		return new Vetor(new Ponto(novo_x, novo_y, novo_z), x, y, z);
 	}
 
 	void normalizar(){
