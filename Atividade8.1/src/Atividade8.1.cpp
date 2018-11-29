@@ -80,8 +80,12 @@ class Funcoes{
 			glutInitWindowPosition(100, 100); // Position the window's initial top-left corner
 			glutCreateWindow("Atividade 8.1"); // Create a window with the given title
 
+			abrir_arquivo("obj/dodge_viper.obj");
+
+			Ponto* p1 = new Ponto(mesh_principal.get_centro_massa()->get_x(),mesh_principal.get_centro_massa()->get_y(),mesh_principal.get_centro_massa()->get_z()+200);
+
 			camera = new Camera(
-					new Vetor3(new Ponto(50,0,200), 0,0,0),
+					new Vetor3(p1, new Vetor(p1,1,0,0), new Vetor(p1,0,1,0), new Vetor(p1,0,0,1)),
 					new Ponto(0,0,0),
 					new Vetor(new Ponto(0,10,0), 0,0,0),
 					45,aspecto,0,0);
@@ -107,7 +111,9 @@ class Funcoes{
 					camera->getUp()->get_z()
 			);
 
-			abrir_arquivo("obj/dodge_viper.obj");
+
+
+			camera->setModelViewMatrix();
 	}
 
 	void abrir_arquivo(string arquivo_caminho){
@@ -196,56 +202,27 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT);         // Clear the color buffer
 
 	funcoes.mesh_principal.imprimir();
-	funcoes.mesh_principal.imprimir_centro_massa();
-
-
+//	funcoes.mesh_principal.imprimir_centro_massa();
+	funcoes.camera->imprimir_look();
 
 	glutSwapBuffers();
 }
 
 void teclado(unsigned char tecla, int x, int y){
-/*
-	if(toupper(tecla) == 'O'){
-		funcoes.abrir_arquivo();
-		return;
-	}
-
-	MatrizTransformacao* matriz = funcoes.mesh_principal.get_matriz_transformacao();
-
-	matriz->set_eixo(toupper(tecla));
-*/
 	switch(tecla){
-		case 'z' : funcoes.camera->slide(-1,0,0); break;
-		case 'Z' : funcoes.camera->slide(-1,0,0); break;
-	/*	case 'p' : funcoes.camera->pitch(1); break;
-		case 'P' : funcoes.camera->pitch(1); break;
-		case 'r' : funcoes.camera->roll(1); break;
-		case 'R' : funcoes.camera->roll(1); break;
-		case 'y' : funcoes.camera->yaw(1); break;
-		case 'Y' : funcoes.camera->yaw(1); break;*/
+		case 'z' : funcoes.camera->slide(0,0,-1); break;
+		case 'Z' : funcoes.camera->slide(0,0,1); break;
+		case 'p' : funcoes.camera->pitch(-5); break;
+		case 'P' : funcoes.camera->pitch(5); break;
+		case 'r' : funcoes.camera->roll(-5); break;
+		case 'R' : funcoes.camera->roll(5); break;
+		case 'y' : funcoes.camera->yaw(-5); break;
+		case 'Y' : funcoes.camera->yaw(5); break;
 		default: break;
 	}
 
 	glutPostRedisplay();
 
-}
-
-void setas(int tecla, int x, int y){
-/*
-	MatrizTransformacao* matriz = funcoes.mesh_principal.get_matriz_transformacao();
-
-	switch(tecla){
-		case GLUT_KEY_PAGE_UP : matriz->translacao(0,0,5); break;
-		case GLUT_KEY_PAGE_DOWN : matriz->translacao(0,0,-5); break;
-		case GLUT_KEY_UP : matriz->translacao(0, 5, 0); break;
-		case GLUT_KEY_DOWN : matriz->translacao(0, -5, 0); break;
-		case GLUT_KEY_LEFT : matriz->translacao(-5, 0, 0); break;
-		case GLUT_KEY_RIGHT : matriz->translacao(5, 0, 0); break;
-		default : break;
-	}
-
-	glutPostRedisplay();
-*/
 }
 
 /* Main function: GLUT runs as a console application starting at main()  */
@@ -255,7 +232,6 @@ int main(int argc, char** argv) {
 	funcoes.config_glut();
 
 	glutKeyboardFunc(teclado);
-	glutSpecialFunc(setas);
 	glutDisplayFunc(display); // Register display callback handler for window re-paint
 	glutMainLoop();           // Enter the infinitely event-processing loop
 	return 0;

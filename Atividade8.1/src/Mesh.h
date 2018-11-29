@@ -76,8 +76,9 @@ class Mesh{
 	}
 
 	void imprimir(){
+		glLineWidth(1);
 		if(lista_faces.size() > 1){
-			glColor3ub(255, 0, 0);
+			glColor3ub(255, 153, 0);
 			for(unsigned int i = 0; i<lista_faces.size(); i++){
 				Face* face_atual = lista_faces.at(i);
 

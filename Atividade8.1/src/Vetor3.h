@@ -1,8 +1,8 @@
 #ifndef VETOR3_H_
 #define VETOR3_H_
 
-#include "Ponto.h"
-#include "Vetor.h"
+class Ponto;
+class Vetor;
 
 class Vetor3{
 

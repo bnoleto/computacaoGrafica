@@ -2,12 +2,13 @@
 #define VETOR_H_
 
 #include<math.h>
+#include "Ponto.h"
 
 class Vetor {
 
 	private :
 
-		double x = 0, y = 0, z = 0;
+		double x, y, z;
 		Ponto *origem;
 
 	public :
@@ -29,6 +30,11 @@ class Vetor {
 
 	double get_z() {
 		return this->z;
+	}
+
+	Vetor clone(){
+		Ponto *clone = new Ponto(origem->get_x(), origem->get_y(), origem->get_z());
+		return Vetor(clone, x, y, z);
 	}
 
 	Ponto* get_origem(){
@@ -66,6 +72,12 @@ class Vetor {
 		this->x /= maior_valor;
 		this->y /= maior_valor;
 		this->z /= maior_valor;
+	}
+
+	void set(double x, double y, double z) {
+		this->x = x;
+		this->y = y;
+		this->z = z;
 	}
 };
 

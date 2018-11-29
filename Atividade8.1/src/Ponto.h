@@ -34,6 +34,10 @@ class Ponto{
 			this->z = z;
 		}
 
+		Ponto clone(){
+			return Ponto(x, y, z);
+		}
+
 		bool operator==(const Ponto& outro){
 			return this == &outro;
 		}

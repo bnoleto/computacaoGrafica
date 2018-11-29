@@ -2,6 +2,8 @@
 #define CAMERA_H_
 
 #include "Vetor3.h"
+#include "Vetor.h"
+#include <math.h>
 
 class Camera{
 	private:
@@ -99,6 +101,112 @@ class Camera{
 
 		setModelViewMatrix();
 	}
+
+	void roll(double angulo){
+
+		double pi = 3.14159265;
+
+		double cs = cos(pi/180.0*angulo);
+		double sn = sin(pi/180.0*angulo);
+
+		Vetor t = olho->get_u()->clone();
+
+		Vetor *u = olho->get_u();
+		Vetor *v = olho->get_v();
+
+		u->set(
+			cs*t.get_x() - sn*v->get_x(),
+			cs*t.get_y() - sn*v->get_y(),
+			cs*t.get_z() - sn*v->get_z()
+		);
+
+		v->set(
+			sn*t.get_x() + cs*v->get_x(),
+			sn*t.get_y() + cs*v->get_y(),
+			sn*t.get_z() + cs*v->get_z()
+		);
+
+
+		setModelViewMatrix();
+	}
+
+	void pitch(double angulo){
+
+		double pi = 3.14159265;
+
+		double cs = cos(pi/180.0*angulo);
+		double sn = sin(pi/180.0*angulo);
+
+		Vetor t = olho->get_v()->clone();
+
+		Vetor *v = olho->get_v();
+		Vetor *n = olho->get_n();
+
+		v->set(
+			cs*t.get_x() - sn*n->get_x(),
+			cs*t.get_y() - sn*n->get_y(),
+			cs*t.get_z() - sn*n->get_z()
+		);
+
+		n->set(
+			sn*t.get_x() + cs*n->get_x(),
+			sn*t.get_y() + cs*n->get_y(),
+			sn*t.get_z() + cs*n->get_z()
+		);
+
+		setModelViewMatrix();
+	}
+
+	void yaw(double angulo){
+
+		double pi = 3.14159265;
+
+		double cs = cos(pi/180.0*angulo);
+		double sn = sin(pi/180.0*angulo);
+
+		Vetor t = olho->get_n()->clone();
+
+		Vetor *n = olho->get_n();
+		Vetor *u = olho->get_u();
+
+		n->set(
+			cs*t.get_x() - sn*u->get_x(),
+			cs*t.get_y() - sn*u->get_y(),
+			cs*t.get_z() - sn*u->get_z()
+		);
+
+		u->set(
+			sn*t.get_x() + cs*u->get_x(),
+			sn*t.get_y() + cs*u->get_y(),
+			sn*t.get_z() + cs*u->get_z()
+		);
+
+		setModelViewMatrix();
+	}
+
+	void imprimir_look(){
+
+		glLineWidth(4);
+
+			glColor3ub(255, 0, 0);
+			glBegin(GL_LINE_STRIP);
+				glVertex3d(look->get_x(), look->get_y(), look->get_z());
+				glVertex3d(look->get_x()+8, look->get_y(), look->get_z());
+			glEnd();
+
+			glColor3ub(0, 255, 0);
+			glBegin(GL_LINE_STRIP);
+				glVertex3d(look->get_x(), look->get_y(), look->get_z());
+				glVertex3d(look->get_x(), look->get_y()+8, look->get_z());
+			glEnd();
+
+			glColor3ub(51, 153, 255);
+			glBegin(GL_LINE_STRIP);
+				glVertex3d(look->get_x(), look->get_y(), look->get_z());
+				glVertex3d(look->get_x(), look->get_y(), look->get_z()+8);
+			glEnd();
+	}
 };
 
 #endif /* CAMERA_H_ */
+
