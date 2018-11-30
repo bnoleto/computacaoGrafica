@@ -2,7 +2,6 @@
 #define CAMERA_H_
 
 #include "Vetor3.h"
-#include "Vetor.h"
 #include <math.h>
 
 class Camera{
@@ -10,14 +9,14 @@ class Camera{
 
 	Ponto *look;
 	Ponto *olho;
-	Vetor *up;
-	Vetor *u, *v, *n;
+	Vetor3 *up;
+	Vetor3 *u, *v, *n;
 
 	double angulo_visao, aspecto, nearDist, farDist;
 
 	public:
 
-	Camera(Ponto* olho, Ponto* look,Vetor* up, Vetor* u,Vetor* v,Vetor* n, double angulo, double aspecto, double nearDist, double farDist){
+	Camera(Ponto* olho, Ponto* look,Vetor3* up, Vetor3* u,Vetor3* v,Vetor3* n, double angulo, double aspecto, double nearDist, double farDist){
 		this->olho = olho;
 		this->look = look;
 		this->up = up;
@@ -38,7 +37,7 @@ class Camera{
 		return this->look;
 	}
 
-	Vetor* getUp(){
+	Vetor3* getUp(){
 		return up;
 	}
 
@@ -70,7 +69,7 @@ class Camera{
 
 	void set(){
 
-		n = new Vetor(olho,
+		n = new Vetor3(
 				olho->get_x() - look->get_x(),
 				olho->get_y() - look->get_y(),
 				olho->get_z() - look->get_z());
@@ -84,16 +83,16 @@ class Camera{
 
 	void setModelViewMatrix(){
 
-		Vetor *eVec = new Vetor(olho, olho->get_x(), olho->get_y(), olho->get_z());
+		Vetor3 *eVec = new Vetor3(olho);
 
-		float m[16];
+		double m[16];
 
-	    m[0] = u->get_x(); m[4] = u->get_y(); m[8] = u->get_z(); m[12] = -eVec->get_origem()->get_x();
-	    m[1] = v->get_x(); m[5] = v->get_y(); m[9] = v->get_z(); m[13] = -eVec->get_origem()->get_y();
-	    m[2] = n->get_x(); m[6] = n->get_y(); m[10] = n->get_z(); m[14] = -eVec->get_origem()->get_z();
+	    m[0] = u->get_x(); m[4] = u->get_y(); m[8] = u->get_z(); m[12] = -eVec->dot(u);
+	    m[1] = v->get_x(); m[5] = v->get_y(); m[9] = v->get_z(); m[13] = -eVec->dot(v);
+	    m[2] = n->get_x(); m[6] = n->get_y(); m[10] = n->get_z(); m[14] = -eVec->dot(n);
 	    m[3] = 0; m[7] = 0; m[11] = 0; m[15] = 1.0;
 	    glMatrixMode(GL_MODELVIEW);
-	    glLoadMatrixf(m);
+	    glLoadMatrixd(m);
 	}
 
 	void slide(double delU, double delV, double delN){
@@ -114,7 +113,7 @@ class Camera{
 		double cs = cos(pi/180.0*angulo);
 		double sn = sin(pi/180.0*angulo);
 
-		Vetor t = u->clone();
+		Vetor3 t = u->clone();
 
 		u->set(
 			cs*t.get_x() - sn*v->get_x(),
@@ -138,10 +137,7 @@ class Camera{
 		double cs = cos(pi/180.0*angulo);
 		double sn = sin(pi/180.0*angulo);
 
-		Vetor r = n->clone();
-		Vetor s = u->clone();
-		Vetor t = v->clone();
-		Vetor t2 = v->clone();
+		Vetor3 t = v->clone();
 
 		v->set(
 			cs*t.get_x() - sn*n->get_x(),
@@ -155,14 +151,6 @@ class Camera{
 			sn*t.get_z() + cs*n->get_z()
 		);
 
-
-
-		olho->set(
-			u->get_x() + v->get_x() + n->get_x(),
-			u->get_y() + v->get_x() + n->get_y(),
-			olho->get_z()
-		);
-
 		setModelViewMatrix();
 	}
 
@@ -173,7 +161,7 @@ class Camera{
 		double cs = cos(pi/180.0*angulo);
 		double sn = sin(pi/180.0*angulo);
 
-		Vetor t = n->clone();
+		Vetor3 t = n->clone();
 
 		n->set(
 			cs*t.get_x() - sn*u->get_x(),

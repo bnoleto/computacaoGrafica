@@ -82,10 +82,10 @@ class Funcoes{
 
 			abrir_arquivo("obj/dodge_viper.obj");
 
-			Ponto* p1 = new Ponto(mesh_principal.get_centro_massa()->get_x(),mesh_principal.get_centro_massa()->get_y(),mesh_principal.get_centro_massa()->get_z()+200);
+			Ponto *p1 = new Ponto(0,0,200);
 
 			camera = new Camera(
-					new Ponto(0,0,mesh_principal.get_centro_massa()->get_z()+100), p1, new Vetor(p1,0,0,1) ,new Vetor(p1,1,0,0), new Vetor(p1,0,1,0), new Vetor(p1,0,0,1),
+					p1, new Ponto(0,0,0), new Vetor3(0,0,1) ,new Vetor3(1,0,0), new Vetor3(0,1,0), new Vetor3(0,0,1),
 					45,aspecto,0,0);
 
 			camera->set_shape(45, aspecto, 10, 1000);
