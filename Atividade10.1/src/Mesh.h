@@ -83,7 +83,7 @@ class Mesh{
 			for(unsigned int i = 0; i<lista_faces.size(); i++){
 				Face* face_atual = lista_faces.at(i);
 
-				glBegin(GL_POLYGON);
+				glBegin(GL_LINE_STRIP);
 
 				for(unsigned int j = 0; j<face_atual->get_pontos()->size(); j++){
 					glVertex3d(face_atual->get_pontos()->at(j)->get_x(), face_atual->get_pontos()->at(j)->get_y(), face_atual->get_pontos()->at(j)->get_z());

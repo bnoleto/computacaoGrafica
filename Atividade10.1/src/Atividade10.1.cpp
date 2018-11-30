@@ -85,10 +85,8 @@ class Funcoes{
 			Ponto* p1 = new Ponto(mesh_principal.get_centro_massa()->get_x(),mesh_principal.get_centro_massa()->get_y(),mesh_principal.get_centro_massa()->get_z()+200);
 
 			camera = new Camera(
-					new Vetor3(p1, new Vetor(p1,1,0,0), new Vetor(p1,0,1,0), new Vetor(p1,0,0,1)),
-					new Ponto(0,0,0),
-					new Vetor(new Ponto(0,10,0), 0,0,0),
-					45,aspecto,0,0);
+				p1, new Ponto(0,0,0), new Vetor3(0,0,1) ,new Vetor3(1,0,0), new Vetor3(0,1,0), new Vetor3(0,0,1),
+				45,aspecto,0,0);
 
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
