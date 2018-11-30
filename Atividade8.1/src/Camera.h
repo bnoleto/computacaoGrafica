@@ -9,40 +9,53 @@ class Camera{
 	private:
 
 	Ponto *look;
-	Vetor3 *olho;
+	Ponto *olho;
 	Vetor *up;
+	Vetor *u, *v, *n;
 
 	double angulo_visao, aspecto, nearDist, farDist;
 
 	public:
 
-	Camera(Vetor3* olho, Ponto* look,Vetor* up, double angulo, double aspecto, double nearDist, double farDist){
-		this->olho = olho;
-		this->look = look;
-		this->up = up;
-		this->angulo_visao = angulo;
-		this->aspecto = aspecto;
-		this->nearDist = nearDist;
-		this->farDist = farDist;
-	}
+//	Camera(Vetor3* olho, Ponto* look,Vetor* up, double angulo, double aspecto, double nearDist, double farDist){
+//		this->olho = olho;
+//		this->look = look;
+//		this->up = up;
+//		this->angulo_visao = angulo;
+//		this->aspecto = aspecto;
+//		this->nearDist = nearDist;
+//		this->farDist = farDist;
+//	}
 
 	Ponto* getOlho(){
-		return olho->get_origem();
+		return olho;
 	}
 
 	Ponto* getLook(){
 		return this->look;
 	}
 
-	Ponto* getUp(){
-		return this->up->get_origem();
+	Vetor* getUp(){
+		return up;
+	}
+
+	void set_shape(double v_angle, double asp, double nr, double fr){
+		angulo_visao = v_angle;
+		aspecto = asp;
+		nearDist = nr;
+		farDist = fr;
+
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluPerspective(angulo_visao, aspecto, nearDist, farDist);
+		glMatrixMode(GL_MODELVIEW);
 	}
 
 	void atualizarCamera(){
 		gluLookAt(
-				olho->get_origem()->get_x(),
-				olho->get_origem()->get_y(),
-				olho->get_origem()->get_z(),
+				olho->get_x(),
+				olho->get_y(),
+				olho->get_z(),
 				look->get_x(),
 				look->get_y(),
 				look->get_z(),
@@ -53,14 +66,11 @@ class Camera{
 	}
 
 	void set(){
-		Vetor *u = olho->get_u();
-		Vetor *v = olho->get_v();
-		Vetor *n = olho->get_n();
 
-		n = new Vetor(olho->get_origem(),
-				olho->get_origem()->get_x() - look->get_x(),
-				olho->get_origem()->get_y() - look->get_y(),
-				olho->get_origem()->get_z() - look->get_z());
+		n = new Vetor(olho,
+				olho->get_x() - look->get_x(),
+				olho->get_y() - look->get_y(),
+				olho->get_z() - look->get_z());
 		u = up->produtoVetorial(n);
 
 		n->normalizar();
@@ -71,13 +81,9 @@ class Camera{
 
 	void setModelViewMatrix(){
 
-		Vetor *eVec = new Vetor(olho->get_origem(), olho->get_origem()->get_x(), olho->get_origem()->get_y(), olho->get_origem()->get_z());
+		Vetor *eVec = new Vetor(olho, olho->get_x(), olho->get_y(), olho->get_z());
 
 		float m[16];
-
-		Vetor *u = olho->get_u();
-		Vetor *v = olho->get_v();
-		Vetor *n = olho->get_n();
 
 	    m[0] = u->get_x(); m[4] = u->get_y(); m[8] = u->get_z(); m[12] = -eVec->get_origem()->get_x();
 	    m[1] = v->get_x(); m[5] = v->get_y(); m[9] = v->get_z(); m[13] = -eVec->get_origem()->get_y();
@@ -89,14 +95,10 @@ class Camera{
 
 	void slide(double delU, double delV, double delN){
 
-		Vetor *u = olho->get_u();
-		Vetor *v = olho->get_v();
-		Vetor *n = olho->get_n();
-
-		olho->get_origem()->set(
-				olho->get_origem()->get_x() + delU * u->get_x() + delV * v->get_x() + delN * n->get_x(),
-				olho->get_origem()->get_y() + delU * u->get_y() + delV * v->get_y() + delN * n->get_y(),
-				olho->get_origem()->get_z() + delU * u->get_z() + delV * v->get_z() + delN * n->get_z()
+		olho->set(
+				olho->get_x() + delU * u->get_x() + delV * v->get_x() + delN * n->get_x(),
+				olho->get_y() + delU * u->get_y() + delV * v->get_y() + delN * n->get_y(),
+				olho->get_z() + delU * u->get_z() + delV * v->get_z() + delN * n->get_z()
 				);
 
 		setModelViewMatrix();
@@ -109,10 +111,7 @@ class Camera{
 		double cs = cos(pi/180.0*angulo);
 		double sn = sin(pi/180.0*angulo);
 
-		Vetor t = olho->get_u()->clone();
-
-		Vetor *u = olho->get_u();
-		Vetor *v = olho->get_v();
+		Vetor t = u->clone();
 
 		u->set(
 			cs*t.get_x() - sn*v->get_x(),
@@ -137,10 +136,7 @@ class Camera{
 		double cs = cos(pi/180.0*angulo);
 		double sn = sin(pi/180.0*angulo);
 
-		Vetor t = olho->get_v()->clone();
-
-		Vetor *v = olho->get_v();
-		Vetor *n = olho->get_n();
+		Vetor t = v->clone();
 
 		v->set(
 			cs*t.get_x() - sn*n->get_x(),
@@ -164,10 +160,7 @@ class Camera{
 		double cs = cos(pi/180.0*angulo);
 		double sn = sin(pi/180.0*angulo);
 
-		Vetor t = olho->get_n()->clone();
-
-		Vetor *n = olho->get_n();
-		Vetor *u = olho->get_u();
+		Vetor t = n->clone();
 
 		n->set(
 			cs*t.get_x() - sn*u->get_x(),
