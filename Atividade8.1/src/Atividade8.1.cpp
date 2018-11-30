@@ -68,7 +68,7 @@ class Funcoes{
 
 	Mesh mesh_principal;
 	char eixo_rotacao = 'X';
-	Camera camera;
+	Camera* camera = nullptr;
 
 	void config_glut(){
 
@@ -84,13 +84,11 @@ class Funcoes{
 
 			Ponto* p1 = new Ponto(mesh_principal.get_centro_massa()->get_x(),mesh_principal.get_centro_massa()->get_y(),mesh_principal.get_centro_massa()->get_z()+200);
 
-//			camera = new Camera(
-//					new Vetor3(p1, new Vetor(p1,1,0,0), new Vetor(p1,0,1,0), new Vetor(p1,0,0,1)),
-//					new Ponto(0,0,0),
-//					new Vetor(new Ponto(0,10,0), 0,0,0),
-//					45,aspecto,0,0);
+			camera = new Camera(
+					new Ponto(0,0,mesh_principal.get_centro_massa()->get_z()+100), p1, new Vetor(p1,0,0,1) ,new Vetor(p1,1,0,0), new Vetor(p1,0,1,0), new Vetor(p1,0,0,1),
+					45,aspecto,0,0);
 
-			camera.set_shape(45, aspecto, 10, 1000);
+			camera->set_shape(45, aspecto, 10, 1000);
 
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
@@ -102,20 +100,20 @@ class Funcoes{
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity();
 			gluLookAt(
-					camera.getOlho()->get_x(),
-					camera.getOlho()->get_y(),
-					camera.getOlho()->get_z(),
-					camera.getLook()->get_x(),
-					camera.getLook()->get_y(),
-					camera.getLook()->get_z(),
-					camera.getUp()->get_x(),
-					camera.getUp()->get_y(),
-					camera.getUp()->get_z()
+					camera->getOlho()->get_x(),
+					camera->getOlho()->get_y(),
+					camera->getOlho()->get_z(),
+					camera->getLook()->get_x(),
+					camera->getLook()->get_y(),
+					camera->getLook()->get_z(),
+					camera->getUp()->get_x(),
+					camera->getUp()->get_y(),
+					camera->getUp()->get_z()
 			);
 
 
 
-			camera.setModelViewMatrix();
+			camera->setModelViewMatrix();
 	}
 
 	void abrir_arquivo(string arquivo_caminho){
@@ -205,21 +203,21 @@ void display() {
 
 	funcoes.mesh_principal.imprimir();
 //	funcoes.mesh_principal.imprimir_centro_massa();
-	funcoes.camera.imprimir_look();
+	funcoes.camera->imprimir_look();
 
 	glutSwapBuffers();
 }
 
 void teclado(unsigned char tecla, int x, int y){
 	switch(tecla){
-		case 'z' : funcoes.camera.slide(0,0,-1); break;
-		case 'Z' : funcoes.camera.slide(0,0,1); break;
-		case 'p' : funcoes.camera.pitch(-5); break;
-		case 'P' : funcoes.camera.pitch(5); break;
-		case 'r' : funcoes.camera.roll(-5); break;
-		case 'R' : funcoes.camera.roll(5); break;
-		case 'y' : funcoes.camera.yaw(-5); break;
-		case 'Y' : funcoes.camera.yaw(5); break;
+		case 'z' : funcoes.camera->slide(0,0,-1); break;
+		case 'Z' : funcoes.camera->slide(0,0,1); break;
+		case 'p' : funcoes.camera->pitch(-5); break;
+		case 'P' : funcoes.camera->pitch(5); break;
+		case 'r' : funcoes.camera->roll(-5); break;
+		case 'R' : funcoes.camera->roll(5); break;
+		case 'y' : funcoes.camera->yaw(-5); break;
+		case 'Y' : funcoes.camera->yaw(5); break;
 		default: break;
 	}
 

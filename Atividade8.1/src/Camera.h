@@ -17,15 +17,18 @@ class Camera{
 
 	public:
 
-//	Camera(Vetor3* olho, Ponto* look,Vetor* up, double angulo, double aspecto, double nearDist, double farDist){
-//		this->olho = olho;
-//		this->look = look;
-//		this->up = up;
-//		this->angulo_visao = angulo;
-//		this->aspecto = aspecto;
-//		this->nearDist = nearDist;
-//		this->farDist = farDist;
-//	}
+	Camera(Ponto* olho, Ponto* look,Vetor* up, Vetor* u,Vetor* v,Vetor* n, double angulo, double aspecto, double nearDist, double farDist){
+		this->olho = olho;
+		this->look = look;
+		this->up = up;
+		this->u = u;
+		this->v = v;
+		this->n = n;
+		this->angulo_visao = angulo;
+		this->aspecto = aspecto;
+		this->nearDist = nearDist;
+		this->farDist = farDist;
+	}
 
 	Ponto* getOlho(){
 		return olho;
@@ -125,7 +128,6 @@ class Camera{
 			sn*t.get_z() + cs*v->get_z()
 		);
 
-
 		setModelViewMatrix();
 	}
 
@@ -136,7 +138,10 @@ class Camera{
 		double cs = cos(pi/180.0*angulo);
 		double sn = sin(pi/180.0*angulo);
 
+		Vetor r = n->clone();
+		Vetor s = u->clone();
 		Vetor t = v->clone();
+		Vetor t2 = v->clone();
 
 		v->set(
 			cs*t.get_x() - sn*n->get_x(),
@@ -148,6 +153,14 @@ class Camera{
 			sn*t.get_x() + cs*n->get_x(),
 			sn*t.get_y() + cs*n->get_y(),
 			sn*t.get_z() + cs*n->get_z()
+		);
+
+
+
+		olho->set(
+			u->get_x() + v->get_x() + n->get_x(),
+			u->get_y() + v->get_x() + n->get_y(),
+			olho->get_z()
 		);
 
 		setModelViewMatrix();
