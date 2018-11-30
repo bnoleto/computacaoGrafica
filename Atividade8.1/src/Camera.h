@@ -186,25 +186,107 @@ class Camera{
 
 	void imprimir_look(){
 
-		glLineWidth(4);
 
-			glColor3ub(255, 0, 0);
-			glBegin(GL_LINE_STRIP);
-				glVertex3d(look->get_x(), look->get_y(), look->get_z());
-				glVertex3d(look->get_x()+8, look->get_y(), look->get_z());
-			glEnd();
+		glColor3ub(255, 0, 0);
+		glBegin(GL_QUADS);
 
-			glColor3ub(0, 255, 0);
-			glBegin(GL_LINE_STRIP);
-				glVertex3d(look->get_x(), look->get_y(), look->get_z());
-				glVertex3d(look->get_x(), look->get_y()+8, look->get_z());
-			glEnd();
+			glVertex3d( look->get_x(), look->get_y()+0.5,look->get_z()+0.5);
+			glVertex3d( look->get_x(), look->get_y()-0.5,look->get_z()-0.5);
+			glVertex3d( look->get_x(), look->get_y()-0.5,look->get_z()-0.5);
+			glVertex3d( look->get_x(), look->get_y()+0.5,look->get_z()+0.5);
 
-			glColor3ub(51, 153, 255);
-			glBegin(GL_LINE_STRIP);
-				glVertex3d(look->get_x(), look->get_y(), look->get_z());
-				glVertex3d(look->get_x(), look->get_y(), look->get_z()+8);
-			glEnd();
+			glVertex3d( look->get_x()+8, look->get_y()+0.5,look->get_z()+0.5);
+			glVertex3d( look->get_x()+8, look->get_y()-0.5,look->get_z()-0.5);
+			glVertex3d( look->get_x()+8, look->get_y()-0.5,look->get_z()-0.5);
+			glVertex3d( look->get_x()+8, look->get_y()+0.5,look->get_z()+0.5);
+
+			glVertex3d( look->get_x(), look->get_y()+0.5,look->get_z()-0.5);
+			glVertex3d( look->get_x()+8, look->get_y()+0.5,look->get_z()-0.5);
+			glVertex3d( look->get_x()+8, look->get_y()-0.5,look->get_z()-0.5);
+			glVertex3d( look->get_x(), look->get_y()-0.5,look->get_z()-0.5);
+
+			glVertex3d( look->get_x(), look->get_y()+0.5,look->get_z()+0.5);
+			glVertex3d( look->get_x()+8, look->get_y()+0.5,look->get_z()+0.5);
+			glVertex3d( look->get_x()+8, look->get_y()-0.5,look->get_z()+0.5);
+			glVertex3d( look->get_x(), look->get_y()-0.5,look->get_z()+0.5);
+
+			glVertex3d( look->get_x(), look->get_y()+0.5,look->get_z()-0.5);
+			glVertex3d( look->get_x()+8, look->get_y()+0.5,look->get_z()-0.5);
+			glVertex3d( look->get_x()+8, look->get_y()+0.5,look->get_z()+0.5);
+			glVertex3d( look->get_x(), look->get_y()+0.5,look->get_z()+0.5);
+
+			glVertex3d( look->get_x(), look->get_y()-0.5,look->get_z()-0.5);
+			glVertex3d( look->get_x()+8, look->get_y()-0.5,look->get_z()-0.5);
+			glVertex3d( look->get_x()+8, look->get_y()-0.5,look->get_z()+0.5);
+			glVertex3d( look->get_x(), look->get_y()-0.5,look->get_z()+0.5);
+
+		glEnd();
+
+		glColor3ub(0, 255, 0);
+		glBegin(GL_QUADS);
+			glVertex3d( look->get_x()+0.5,look->get_y(),   look->get_z()+0.5);
+			glVertex3d( look->get_x()-0.5,look->get_y(),   look->get_z()-0.5);
+			glVertex3d( look->get_x()-0.5,look->get_y(),   look->get_z()-0.5);
+			glVertex3d( look->get_x()+0.5,look->get_y(),   look->get_z()+0.5);
+
+			glVertex3d( look->get_x()+0.5,look->get_y()+8, look->get_z()+0.5);
+			glVertex3d( look->get_x()-0.5,look->get_y()+8, look->get_z()-0.5);
+			glVertex3d( look->get_x()-0.5,look->get_y()+8, look->get_z()-0.5);
+			glVertex3d( look->get_x()+0.5,look->get_y()+8, look->get_z()+0.5);
+
+			glVertex3d( look->get_x()+0.5,look->get_y(),   look->get_z()-0.5);
+			glVertex3d( look->get_x()+0.5,look->get_y()+8, look->get_z()-0.5);
+			glVertex3d( look->get_x()-0.5,look->get_y()+8, look->get_z()-0.5);
+			glVertex3d( look->get_x()-0.5,look->get_y(),   look->get_z()-0.5);
+
+			glVertex3d( look->get_x()+0.5,look->get_y(),   look->get_z()+0.5);
+			glVertex3d( look->get_x()+0.5,look->get_y()+8, look->get_z()+0.5);
+			glVertex3d( look->get_x()-0.5,look->get_y()+8, look->get_z()+0.5);
+			glVertex3d( look->get_x()-0.5,look->get_y(),   look->get_z()+0.5);
+
+			glVertex3d( look->get_x()+0.5,look->get_y(),   look->get_z()-0.5);
+			glVertex3d( look->get_x()+0.5,look->get_y()+8, look->get_z()-0.5);
+			glVertex3d( look->get_x()+0.5,look->get_y()+8, look->get_z()+0.5);
+			glVertex3d( look->get_x()+0.5,look->get_y(),   look->get_z()+0.5);
+
+			glVertex3d( look->get_x()-0.5,look->get_y(),   look->get_z()-0.5);
+			glVertex3d( look->get_x()-0.5,look->get_y()+8, look->get_z()-0.5);
+			glVertex3d( look->get_x()-0.5,look->get_y()+8, look->get_z()+0.5);
+			glVertex3d( look->get_x()-0.5,look->get_y(),   look->get_z()+0.5);
+		glEnd();
+
+		glColor3ub(50, 50, 255);
+		glBegin(GL_QUADS);
+			glVertex3d( look->get_x()+0.5,look->get_y()+0.5, look->get_z());
+			glVertex3d( look->get_x()-0.5,look->get_y()-0.5, look->get_z());
+			glVertex3d( look->get_x()-0.5,look->get_y()-0.5, look->get_z());
+			glVertex3d( look->get_x()+0.5,look->get_y()+0.5, look->get_z());
+
+			glVertex3d( look->get_x()+0.5,look->get_y()+0.5, look->get_z()+8);
+			glVertex3d( look->get_x()-0.5,look->get_y()-0.5, look->get_z()+8);
+			glVertex3d( look->get_x()-0.5,look->get_y()-0.5, look->get_z()+8);
+			glVertex3d( look->get_x()+0.5,look->get_y()+0.5, look->get_z()+8);
+
+			glVertex3d( look->get_x()+0.5,look->get_y()-0.5, look->get_z());
+			glVertex3d( look->get_x()+0.5,look->get_y()-0.5, look->get_z()+8);
+			glVertex3d( look->get_x()-0.5,look->get_y()-0.5, look->get_z()+8);
+			glVertex3d( look->get_x()-0.5,look->get_y()-0.5, look->get_z());
+
+			glVertex3d( look->get_x()+0.5,look->get_y()+0.5, look->get_z());
+			glVertex3d( look->get_x()+0.5,look->get_y()+0.5, look->get_z()+8);
+			glVertex3d( look->get_x()-0.5,look->get_y()+0.5, look->get_z()+8);
+			glVertex3d( look->get_x()-0.5,look->get_y()+0.5, look->get_z());
+
+			glVertex3d( look->get_x()+0.5,look->get_y()-0.5, look->get_z());
+			glVertex3d( look->get_x()+0.5,look->get_y()-0.5, look->get_z()+8);
+			glVertex3d( look->get_x()+0.5,look->get_y()+0.5, look->get_z()+8);
+			glVertex3d( look->get_x()+0.5,look->get_y()+0.5, look->get_z());
+
+			glVertex3d( look->get_x()-0.5,look->get_y()-0.5, look->get_z());
+			glVertex3d( look->get_x()-0.5,look->get_y()-0.5, look->get_z()+8);
+			glVertex3d( look->get_x()-0.5,look->get_y()+0.5, look->get_z()+8);
+			glVertex3d( look->get_x()-0.5,look->get_y()+0.5, look->get_z());
+		glEnd();
 	}
 };
 
