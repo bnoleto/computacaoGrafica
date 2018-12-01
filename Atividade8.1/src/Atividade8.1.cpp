@@ -92,7 +92,6 @@ class Funcoes{
 
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
-			int tamanho = 100;
 
 			//glOrtho(-tamanho*aspecto, tamanho*aspecto, -tamanho, tamanho, -tamanho*4, tamanho*4);
 			gluPerspective(45, aspecto, 0, 1000);

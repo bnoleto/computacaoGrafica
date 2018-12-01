@@ -91,8 +91,6 @@ class Funcoes{
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
 
-			int tamanho = 100;
-
 			//glOrtho(-tamanho*aspecto, tamanho*aspecto, -tamanho, tamanho, -tamanho*4, tamanho*4);
 			gluPerspective(45, aspecto, 0, 1000);
 
@@ -124,6 +122,7 @@ class Funcoes{
 			glEnable(GL_COLOR_MATERIAL);
 			glEnable(GL_LIGHTING);
 			glEnable(GL_LIGHT0);
+			//glEnable(GL_DEPTH_TEST);
 
 			glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luz_difusa);
 			glLightfv(GL_LIGHT0, GL_AMBIENT, luz_ambiente);
