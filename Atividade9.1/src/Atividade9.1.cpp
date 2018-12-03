@@ -66,6 +66,7 @@ void display() {
 	glColor3ub(255,255,255);
 
 	funcoes.objetos.desenhar_letra_t();
+	funcoes.objetos.desenhar_func_matematica();
 
 	glutSwapBuffers();
 }

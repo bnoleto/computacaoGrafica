@@ -77,6 +77,7 @@ class Camera{
 		u = up->produtoVetorial(n);
 
 		n->normalizar();
+
 		u->normalizar();
 
 		v = n->produtoVetorial(u);
