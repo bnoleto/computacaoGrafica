@@ -2,7 +2,6 @@
 #define FACE_H_
 
 #include "Ponto.h"
-#include <vector>
 
 using namespace std;
 

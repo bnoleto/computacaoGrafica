@@ -2,6 +2,7 @@
 #define CAMERA_H_
 
 #include "Vetor3.h"
+#include "Ponto.h"
 #include <math.h>
 
 class Camera{

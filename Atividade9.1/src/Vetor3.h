@@ -2,6 +2,7 @@
 #define VETOR3_H_
 
 #include<math.h>
+#include "Ponto.h"
 
 class Vetor3 {
 
