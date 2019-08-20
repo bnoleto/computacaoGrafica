@@ -165,6 +165,8 @@ class Funcoes{
 
 Funcoes funcoes; // classe global para as funções do programa
 
+MatrizTransformacao* matriz = funcoes.mesh_principal.get_matriz_transformacao();
+
 void display() {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // Set background color to black and opaque
 
@@ -183,8 +185,6 @@ void teclado(unsigned char tecla, int x, int y){
 		return;
 	}
 
-	MatrizTransformacao* matriz = funcoes.mesh_principal.get_matriz_transformacao();
-
 	matriz->set_eixo(toupper(tecla));
 
 	switch(tecla){
@@ -200,8 +200,6 @@ void teclado(unsigned char tecla, int x, int y){
 
 void setas(int tecla, int x, int y){
 
-	MatrizTransformacao* matriz = funcoes.mesh_principal.get_matriz_transformacao();
-
 	switch(tecla){
 		case GLUT_KEY_PAGE_UP : matriz->translacao(0,0,5); break;
 		case GLUT_KEY_PAGE_DOWN : matriz->translacao(0,0,-5); break;
@@ -216,15 +214,34 @@ void setas(int tecla, int x, int y){
 
 }
 
+void idle(){
+	matriz->rotacao(1);
+	glutPostRedisplay();
+}
+
+void joystick(unsigned int buttonmask, int x, int y, int z){
+
+	MatrizTransformacao* matriz = funcoes.mesh_principal.get_matriz_transformacao();
+
+	matriz->rotacaoXY(y/200,x/200);
+
+	matriz->escala(1+(-(double)z/10000));
+
+	glutPostRedisplay();
+}
+
 /* Main function: GLUT runs as a console application starting at main()  */
 int main(int argc, char** argv) {
 	glutInit(&argc, argv);                 // Initialize GLUT
 
 	funcoes.config_glut();
 
+	glutJoystickFunc(joystick, 25);
 	glutKeyboardFunc(teclado);
 	glutSpecialFunc(setas);
+	glutIdleFunc(idle);
 	glutDisplayFunc(display); // Register display callback handler for window re-paint
 	glutMainLoop();           // Enter the infinitely event-processing loop
+
 	return 0;
 }

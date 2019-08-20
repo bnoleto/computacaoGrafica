@@ -13,7 +13,7 @@ class MatrizTransformacao{
 	double matriz[4][4];
 	vector<Ponto*>* lista_pontos = nullptr;
 	Ponto *centro_massa = nullptr;
-	char eixo_atual = 'X';
+	char eixo_atual = 'Y';
 
 	double rad(double angulo){	// converterá de graus para radianos
 		return angulo*3.141592/180;
@@ -119,6 +119,25 @@ class MatrizTransformacao{
 				matriz[1][1] = cos(rad(angulo));
 				break;
 		}
+
+		aplicar_transformacao();
+	}
+
+	void rotacaoXY(double anguloX,double anguloY){
+
+		// X
+		matriz[1][1] = cos(rad(anguloX));
+		matriz[1][2] = -sin(rad(anguloX));
+		matriz[2][1] = sin(rad(anguloX));
+		matriz[2][2] = cos(rad(anguloX));
+
+		aplicar_transformacao();
+
+		// Y
+		matriz[0][0] = cos(rad(anguloY));
+		matriz[2][0] = -sin(rad(anguloY));
+		matriz[0][2] = sin(rad(anguloY));
+		matriz[2][2] = cos(rad(anguloY));
 
 		aplicar_transformacao();
 	}
